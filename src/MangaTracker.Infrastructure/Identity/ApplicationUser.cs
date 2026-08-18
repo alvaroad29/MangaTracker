@@ -1,0 +1,11 @@
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace MangaTracker.Infrastructure.Identity;
+
+
+public class ApplicationUser : IdentityUser<Guid>
+{
+    public string DisplayName { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
+}

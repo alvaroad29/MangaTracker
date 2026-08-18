@@ -1,0 +1,24 @@
+﻿# === .NET ===
+bin/
+obj/
+*.user
+.vs/
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# === Angular / Node ===
+frontend/mangatracker-web/node_modules/
+frontend/mangatracker-web/dist/
+frontend/mangatracker-web/.angular/
+frontend/mangatracker-web/npm-debug.log
+frontend/mangatracker-web/.env
+
+# === Secretos / config local ===
+appsettings.Development.json
+appsettings.Local.json
+*.env

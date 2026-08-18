@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+      <UserSecretsId>7c55a90f-4e5a-47ac-b86d-709ade9d2e37</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.12" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MangaTracker.Application\MangaTracker.Application.csproj" />
+      <ProjectReference Include="..\MangaTracker.Infrastructure\MangaTracker.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
+</Project>
