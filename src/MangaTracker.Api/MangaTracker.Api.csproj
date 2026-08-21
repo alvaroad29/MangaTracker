@@ -8,6 +8,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.19" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.12" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
           <PrivateAssets>all</PrivateAssets>
@@ -19,10 +20,6 @@
     <ItemGroup>
       <ProjectReference Include="..\MangaTracker.Application\MangaTracker.Application.csproj" />
       <ProjectReference Include="..\MangaTracker.Infrastructure\MangaTracker.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Controllers\" />
     </ItemGroup>
 
 </Project>
