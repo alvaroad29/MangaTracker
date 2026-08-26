@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+:root {
+  --color-bg: #14151a;
+  --color-surface: #1d1e26;
+  --color-surface-alt: #262832;
+  --color-text: #e9e7e2;
+  --color-text-muted: #9a9aa4;
+  --color-accent: #e8a33d;
+  --color-accent-hover: #f2b658;
+  --color-accent-2: #4fa69c;
+  --color-danger: #e2624f;
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.gutter-bg {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 39px,
+    rgba(233, 231, 226, 0.035) 39px,
+    rgba(233, 231, 226, 0.035) 40px
+  );
+}

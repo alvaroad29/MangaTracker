@@ -1,0 +1,32 @@
+<nav class="border-b border-(--color-surface-alt) bg-(--color-surface)">
+  <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+    <a routerLink="/search" class="font-display text-lg tracking-tight text-(--color-accent)">
+      MANGATRACKER
+    </a>
+
+    <div class="flex items-center gap-6 text-sm">
+      <a routerLink="/search" routerLinkActive="text-[color:var(--color-accent)]"
+          class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
+        Buscar
+      </a>
+
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/my-list" routerLinkActive="text-[color:var(--color-accent)]"
+            class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
+          Mi lista
+        </a>
+        <span class="text-(--color-text-muted)">{{ auth.user()?.displayName }}</span>
+        <button
+          (click)="auth.logout()"
+          class="rounded-md cursor-pointer border border-(--color-surface-alt) px-3 py-1.5 text-(--color-text-muted) transition-colors hover:border-(--color-danger) hover:text-(--color-danger)">
+          Salir
+        </button>
+      } @else {
+        <a routerLink="/login"
+            class="rounded-md bg-(--color-accent) px-4 py-1.5 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover)">
+          Ingresar
+        </a>
+      }
+    </div>
+  </div>
+</nav>

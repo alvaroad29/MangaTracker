@@ -1,0 +1,82 @@
+<div class="gutter-bg -mx-6 -my-10 flex min-h-[calc(100vh-73px)] items-center justify-center px-6 py-10">
+  <div class="w-full max-w-sm rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-8">
+    <h1 class="font-display text-2xl text-(--color-accent)">CREAR CUENTA</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Tu progreso, a salvo de links caídos.</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-4">
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="displayName">Nombre</label>
+        <input
+          id="displayName"
+          type="text"
+          formControlName="displayName"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(registerForm, 'displayName')"
+        />
+        @if (formUtils.hasVisibleError(registerForm, 'displayName'))
+        {
+          <p class="mt-1 text-xs text-(--color-danger)">
+            {{ formUtils.getFieldError(registerForm, 'displayName') }}
+          </p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(registerForm, 'email')"
+        />
+
+        @if (formUtils.hasVisibleError(registerForm, 'email'))
+        {
+          <p class="mt-1 text-xs text-(--color-danger)">
+            {{ formUtils.getFieldError(registerForm, 'email') }}
+          </p>
+        }
+
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(registerForm, 'password')"
+        />
+
+        @if (formUtils.hasVisibleError(registerForm, 'password'))
+        {
+          <p class="mt-1 text-xs text-(--color-danger)">
+             {{ formUtils.getFieldError(registerForm, 'password') }}
+          </p>
+        }
+
+      </div>
+
+      @if (errorMessage()) {
+        <p class="rounded-md bg-(--color-danger)/10 px-3 py-2 text-sm text-(--color-danger)">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="mt-2 rounded-md bg-(--color-accent) px-4 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
+      >
+        {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-(--color-text-muted)">
+      ¿Ya tenés cuenta?
+      <a routerLink="/login" class="text-(--color-accent) hover:underline">Ingresá</a>
+    </p>
+  </div>
+</div>

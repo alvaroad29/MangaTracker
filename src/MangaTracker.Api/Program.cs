@@ -1,11 +1,14 @@
+using System.Text;
 using FluentValidation;
 using MangaTracker.Api.ExceptionHandling;
 using MangaTracker.Application.Interfaces;
 using MangaTracker.Infrastructure.Identity;
 using MangaTracker.Infrastructure.Persistence;
 using MangaTracker.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +45,7 @@ builder.Services
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
-        options.Password.RequireNonAlphanumeric = false; // ajustable a gusto
+        options.Password.RequireNonAlphanumeric = false; // caracter raro
         options.Password.RequiredLength = 8;
         options.Password.RequiredUniqueChars = 1;
 
@@ -62,6 +65,28 @@ builder.Services
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// --- JWT ---
+var jwtSecret = builder.Configuration["Jwt:Secret"]!;
+
+builder.Services.AddAuthentication(
+        JwtBearerDefaults.AuthenticationScheme
+        )
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // --- Servicios propios ---
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
@@ -71,7 +96,7 @@ builder.Services.AddScoped<UserMapper>();
 
 var app = builder.Build();
 
-app.UseExceptionHandler(); // primero de todo, para capturar cualquier error de lo que sigue
+app.UseExceptionHandler(); // primero de todoo, para capturar cualquier error de lo que sigue
 
 if (app.Environment.IsDevelopment())
 {

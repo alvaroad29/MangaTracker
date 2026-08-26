@@ -1,0 +1,63 @@
+<div class="gutter-bg -mx-6 -my-10 flex min-h-[calc(100vh-73px)] items-center justify-center px-6 py-10">
+  <div class="w-full max-w-sm rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-8">
+    <h1 class="font-display text-2xl text-(--color-accent)">INGRESAR</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Segui tus mangas donde sea que los leas.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-4">
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(loginForm, 'email')"
+        />
+
+        @if (formUtils.hasVisibleError(loginForm, 'email'))
+        {
+          <p class="mt-1 text-xs text-(--color-danger)">
+            {{ formUtils.getFieldError(loginForm, 'email') }}
+          </p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+           [class.input-error]="formUtils.hasVisibleError(loginForm, 'password')"
+        />
+
+        @if (formUtils.hasVisibleError(loginForm, 'password'))
+        {
+          <p class="mt-1 text-xs text-(--color-danger)">
+             {{ formUtils.getFieldError(loginForm, 'password') }}
+          </p>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="rounded-md bg-(--color-danger)/10 px-3 py-2 text-sm text-(--color-danger)">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="mt-2 rounded-md bg-(--color-accent) px-4 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
+      >
+        {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-(--color-text-muted)">
+      ¿No tenés cuenta?
+      <a routerLink="/register" class="text-(--color-accent) hover:underline">Registrate</a>
+    </p>
+  </div>
+</div>
