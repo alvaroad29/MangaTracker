@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Polly;
 using Scalar.AspNetCore;
+using Tenrai;
+using Tenrai.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,7 +95,51 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMangaCatalogService, MangaTracker.Infrastructure.Catalog.TenraiCatalogService>();
+
 builder.Services.AddScoped<UserMapper>();
+builder.Services.AddScoped<MangaTracker.Infrastructure.Catalog.CatalogMapper>();
+
+
+// --- Cache ---
+builder.Services.AddMemoryCache();
+
+// --- Tenrai (catálogo de manga) ---
+var tenraiBaseUrl = builder.Configuration["Tenrai:BaseUrl"] ?? "https://api.tenrai.org/v1/";
+
+builder.Services.AddHttpClient("Tenrai", client =>
+{
+    client.BaseAddress = new Uri(tenraiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(15);
+})
+.AddResilienceHandler("tenrai-resilience", resilience => // configurando polly
+{
+    resilience.AddRetry(new Microsoft.Extensions.Http.Resilience.HttpRetryStrategyOptions
+    {
+        MaxRetryAttempts = 3,
+        BackoffType = Polly.DelayBackoffType.Exponential
+    });
+    resilience.AddCircuitBreaker(new Microsoft.Extensions.Http.Resilience.HttpCircuitBreakerStrategyOptions
+    {
+        FailureRatio = 0.5,
+        SamplingDuration = TimeSpan.FromSeconds(30),
+        BreakDuration = TimeSpan.FromSeconds(30)
+    });
+});
+
+builder.Services.AddSingleton<ITenrai>(sp => // configurando el servicio, distinto de antes
+{
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient("Tenrai");
+
+    var config = new TenraiClientConfiguration
+    {
+        LimiterConfigurations = TaskLimiterConfiguration.Default // 60/min, 3/seg — mismo límite que la API pública
+    };
+
+    return new TenraiClient(config, httpClient);
+});
+
 
 var app = builder.Build();
 
