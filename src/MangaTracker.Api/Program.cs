@@ -105,6 +105,8 @@ builder.Services.AddScoped<IMangaCatalogService, MangaTracker.Infrastructure.Cat
 builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<MangaTracker.Infrastructure.Catalog.CatalogMapper>();
 
+builder.Services.AddScoped<IUserMangaEntryService, MangaTracker.Infrastructure.Entries.UserMangaEntryService>();
+builder.Services.AddScoped<IMangaListService, MangaTracker.Infrastructure.Entries.MangaListService>();
 
 // --- Cloudinary ----
 var cloudinaryAccount = new Account(
