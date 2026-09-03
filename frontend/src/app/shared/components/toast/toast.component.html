@@ -1,0 +1,12 @@
+<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+  @for (n of notifications.notifications(); track n.id) {
+    <div
+      class="rounded-md px-4 py-3 text-sm shadow-lg"
+      [class]="n.type === 'error'
+        ? 'bg-(--color-danger) text-white'
+        : 'bg-(--color-accent-2) text-[#14151a]'"
+    >
+      {{ n.message }}
+    </div>
+  }
+</div>

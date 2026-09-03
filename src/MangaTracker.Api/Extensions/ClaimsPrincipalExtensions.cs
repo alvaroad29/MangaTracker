@@ -7,8 +7,10 @@ public static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal user)
     {
-        var value = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-                    ?? throw new InvalidOperationException("El token no contiene un claim 'sub'.");
+        
+        var value = user.FindFirstValue(ClaimTypes.NameIdentifier)
+                    ?? user.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                    ?? throw new InvalidOperationException("El token no contiene un claim de identificador de usuario ('sub' o NameIdentifier).");
 
         return Guid.Parse(value);
     }

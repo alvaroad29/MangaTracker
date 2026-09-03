@@ -108,6 +108,8 @@ builder.Services.AddScoped<MangaTracker.Infrastructure.Catalog.CatalogMapper>();
 builder.Services.AddScoped<IUserMangaEntryService, MangaTracker.Infrastructure.Entries.UserMangaEntryService>();
 builder.Services.AddScoped<IMangaListService, MangaTracker.Infrastructure.Entries.MangaListService>();
 
+builder.Services.AddScoped<IMangaListSocialService, MangaTracker.Infrastructure.Social.MangaListSocialService>();
+
 // --- Cloudinary ----
 var cloudinaryAccount = new Account(
     builder.Configuration["Cloudinary:CloudName"],

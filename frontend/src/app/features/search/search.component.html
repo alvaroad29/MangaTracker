@@ -1,1 +1,33 @@
-<p class="text-(--color-text-muted)">Búsqueda — próximamente (Fase 7).</p>
+<div class="flex flex-col gap-6">
+  <div>
+    <h1 class="font-display text-2xl text-(--color-accent)">BUSCAR MANGA</h1>
+    <input
+      type="text"
+      placeholder="Ej: Berserk, One Piece, Chainsaw Man..."
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      class="mt-4 w-full max-w-xl rounded-md border border-(--color-surface-alt) bg-(--color-surface) px-4 py-2.5 text-(--color-text) outline-none focus:border-(--color-accent)"
+    />
+  </div>
+
+  @if (loading()) {
+    <p class="text-(--color-text-muted)">Buscando...</p>
+  } @else if (searched() && results().length === 0) {
+    <p class="text-(--color-text-muted)">No encontramos resultados para "{{ query() }}".</p>
+  }
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    @for (manga of results(); track manga.malId) {
+      <a
+        [routerLink]="['/manga', manga.malId]"
+        class="group flex flex-col overflow-hidden rounded-lg border border-(--color-surface-alt) bg-(--color-surface) transition-colors hover:border-(--color-accent)"
+      >
+        <img [src]="manga.coverImageUrl" [alt]="manga.title" class="aspect-2/3 w-full object-cover" />
+        <div class="p-3">
+          <p class="line-clamp-2 text-sm font-medium">{{ manga.title }}</p>
+          <p class="mt-1 text-xs text-(--color-text-muted)">{{ typeLabels[manga.type] }}</p>
+        </div>
+      </a>
+    }
+  </div>
+</div>

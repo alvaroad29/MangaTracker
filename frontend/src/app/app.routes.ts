@@ -20,5 +20,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/my-list/my-list.component').then(m => m.MyListComponent)
   },
+  {
+    path: 'manga/:malId',
+    loadComponent: () => import('./features/manga-detail/manga-detail.component').then(m => m.MangaDetailComponent)
+  },
   { path: '**', redirectTo: 'search' }
 ];

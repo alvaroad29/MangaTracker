@@ -1,0 +1,38 @@
+@if (loading()) {
+  <p class="text-(--color-text-muted)">Cargando...</p>
+} @else if (manga(); as manga) {
+  <div class="flex flex-col gap-6 sm:flex-row">
+    <img [src]="manga.coverImageUrl" [alt]="manga.title" class="w-48 shrink-0 rounded-lg object-cover" />
+
+    <div class="flex flex-col gap-3">
+      <h1 class="font-display text-2xl">{{ manga.title }}</h1>
+      @if (manga.titleEnglish && manga.titleEnglish !== manga.title) {
+        <p class="text-(--color-text-muted)">{{ manga.titleEnglish }}</p>
+      }
+
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span class="rounded-full bg-(--color-surface-alt) px-3 py-1">{{ typeLabels[manga.type] }}</span>
+        @if (manga.status !== null) {
+          <span class="rounded-full bg-(--color-surface-alt) px-3 py-1">{{ publicationStatusLabels[manga.status] }}</span>
+        }
+        @for (genre of manga.genres; track genre.malId) {
+          <span class="rounded-full bg-(--color-surface-alt) px-3 py-1">{{ genre.name }}</span>
+        }
+      </div>
+
+      @if (manga.synopsis) {
+        <p class="max-w-2xl whitespace-pre-line text-sm text-(--color-text-muted)">{{ manga.synopsis }}</p>
+      }
+
+      @if (auth.isAuthenticated()) {
+        <button
+          (click)="addToMyList()"
+          [disabled]="adding()"
+          class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
+        >
+          {{ adding() ? 'Agregando...' : 'Agregar a mi lista' }}
+        </button>
+      }
+    </div>
+  </div>
+}
