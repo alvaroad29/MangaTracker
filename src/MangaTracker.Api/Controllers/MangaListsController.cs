@@ -8,7 +8,7 @@ namespace MangaTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/lists")]
-[Authorize]
+[Authorize] // controller para manejar mis listas (usuario que esta logueado)
 public class MangaListsController(IMangaListService listService) : ControllerBase
 {
     [HttpPost]
@@ -16,7 +16,7 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
         => Ok(await listService.CreateAsync(User.GetUserId(), request));
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll() // obtener listas de un usuario
         => Ok(await listService.GetAllAsync(User.GetUserId()));
 
     [HttpPut("{listId:guid}")]
@@ -31,6 +31,7 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
     }
 
     [HttpGet("{listId:guid}/items")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetItems(Guid listId)
         => Ok(await listService.GetItemsAsync(User.GetUserId(), listId));
 

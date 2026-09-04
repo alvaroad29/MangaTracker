@@ -12,6 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 
+    // console.log({req});
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // No reintentamos el refresh del propio endpoint de refresh, para evitar loop infinito

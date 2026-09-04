@@ -19,13 +19,13 @@ public class MangaListSocialController(IMangaListSocialService socialService) : 
 
     [HttpGet("users/{userId:guid}/lists")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetUserLists(Guid userId)
+    public async Task<IActionResult> GetUserLists(Guid userId) // listas de un usuario en particular
     {
-        var currentUserId = TryGetCurrentUserId();
+        var currentUserId = TryGetCurrentUserId(); // para saber si lo sigo o no a esa lista
         return Ok(await socialService.GetUserPublicListsAsync(userId, currentUserId));
     }
 
-    [HttpGet("lists/followed")]
+    [HttpGet("lists/followed")] // listas que sigue el usuario logueado
     [Authorize]
     public async Task<IActionResult> GetFollowed()
         => Ok(await socialService.GetFollowedListsAsync(User.GetUserId()));

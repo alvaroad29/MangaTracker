@@ -16,7 +16,7 @@ public class MangaListSocialService(ApplicationDbContext db) : IMangaListSocialS
         // el id es para calcular la propiedad IsFollowedByMe, si es null (no logueado) sera falsa toda
         var query = BasePublicListQuery(currentUserId);
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(search)) // busca lista por nombre
             query = query.Where(x => x.List.Name.Contains(search));
 
         var results = await query
@@ -30,7 +30,9 @@ public class MangaListSocialService(ApplicationDbContext db) : IMangaListSocialS
 
     public async Task<IReadOnlyList<PublicMangaListDto>> GetUserPublicListsAsync(Guid targetUserId, Guid? currentUserId)
     {
-        var query = BasePublicListQuery(currentUserId).Where(x => x.List.UserId == targetUserId);
+        // el currentUserId sirve para calcular la propiedad IsFollowedByMe, si es null (no logueado)
+        // sera falsa toda
+        var query = BasePublicListQuery(currentUserId).Where(x => x.List.UserId == targetUserId); // las listas que coincidan con el targetId (vino como parametro)
         var results = await query.OrderByDescending(x => x.List.CreatedAt).ToListAsync();
         return results.Select(ToDto).ToList();
     }

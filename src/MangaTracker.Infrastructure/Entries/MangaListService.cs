@@ -69,22 +69,45 @@ public class MangaListService(ApplicationDbContext db) : IMangaListService
         db.MangaLists.Remove(list); // cascada configurada en Fase 1: borra MangaListItems y ListFollows asociados
         await db.SaveChangesAsync();
     }
-
-    public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId)
+    
+    public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid? viewerUserId, Guid listId)
     {
-        await FindOwnedListAsync(userId, listId); // valida ownership antes de listar
+        var list = await db.MangaLists.FirstOrDefaultAsync(l => l.Id == listId)
+                   ?? throw new NotFoundAppException("No se encontró esa lista.");
+
+        var isOwner = viewerUserId.HasValue && list.UserId == viewerUserId.Value; // si es el dueño
+        
+        
+        if (!isOwner && !list.IsPublic) // solo entra si no es el dueño y la lista es privada 
+            throw new NotFoundAppException("No se encontró esa lista."); // mismo mensaje que "no existe": no delatamos que es privada
 
         var items = await db.MangaListItems
             .Include(i => i.UserMangaEntry)
-                .ThenInclude(e => e.MangaSnapshot)
-                    .ThenInclude(s => s.MangaSnapshotGenres)
-                        .ThenInclude(sg => sg.Genre)
+            .ThenInclude(e => e.MangaSnapshot)
+            .ThenInclude(s => s.MangaSnapshotGenres)
+            .ThenInclude(sg => sg.Genre)
             .Where(i => i.MangaListId == listId)
             .OrderByDescending(i => i.AddedAt)
             .ToListAsync();
 
         return items.Select(ToItemDto).ToList();
     }
+
+    // public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId)
+    // {
+    //     await FindOwnedListAsync(userId, listId); // valida ownership antes de listar
+    //
+    //     var items = await db.MangaListItems
+    //         .Include(i => i.UserMangaEntry)
+    //             .ThenInclude(e => e.MangaSnapshot)
+    //                 .ThenInclude(s => s.MangaSnapshotGenres)
+    //                     .ThenInclude(sg => sg.Genre)
+    //         .Where(i => i.MangaListId == listId)
+    //         .OrderByDescending(i => i.AddedAt)
+    //         .ToListAsync();
+    //
+    //     return items.Select(ToItemDto).ToList();
+    // }
 
     public async Task AddItemAsync(Guid userId, Guid listId, Guid entryId)
     {

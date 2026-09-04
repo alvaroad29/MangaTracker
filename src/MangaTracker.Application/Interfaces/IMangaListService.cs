@@ -9,7 +9,8 @@ public interface IMangaListService
     Task<MangaListDto> UpdateAsync(Guid userId, Guid listId, UpdateMangaListRequest request); // act. info lista
     Task DeleteAsync(Guid userId, Guid listId);
 
-    Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId); // treaer items lista
+    // Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId); // treaer items lista
+    Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid? viewerUserId, Guid listId);
     Task AddItemAsync(Guid userId, Guid listId, Guid entryId); // agregar item lista
     Task RemoveItemAsync(Guid userId, Guid listId, Guid entryId);
 }
