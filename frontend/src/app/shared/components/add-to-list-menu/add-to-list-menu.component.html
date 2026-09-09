@@ -1,0 +1,23 @@
+ <div class="relative">
+      <button
+        (click)="open.set(!open())"
+        class="flex items-center gap-1 text-xs text-(--color-accent-2) hover:underline"
+      >
+        + Agregar a lista
+      </button>
+
+      @if (open()) {
+        <div class="absolute left-0 top-full z-10 mt-1 w-48 rounded-md border border-(--color-surface-alt) bg-(--color-surface) py-1 shadow-lg">
+          @for (list of lists(); track list.id) {
+            <button
+              (click)="pick(list.id)"
+              class="block w-full px-3 py-1.5 text-left text-sm hover:bg-(--color-surface-alt)"
+            >
+              {{ list.name }}
+            </button>
+          } @empty {
+            <p class="px-3 py-1.5 text-xs text-(--color-text-muted)">No tenés listas creadas todavía.</p>
+          }
+        </div>
+      }
+    </div>

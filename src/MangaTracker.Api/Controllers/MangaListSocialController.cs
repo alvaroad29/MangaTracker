@@ -45,10 +45,17 @@ public class MangaListSocialController(IMangaListSocialService socialService) : 
         await socialService.UnfollowAsync(User.GetUserId(), listId);
         return NoContent();
     }
+    
+    [HttpGet("users/{userId:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUserProfile(Guid userId)
+        => Ok(await socialService.GetUserProfileAsync(userId));
 
     private Guid? TryGetCurrentUserId()
     {
         if (User.Identity?.IsAuthenticated != true) return null;
         return User.GetUserId();
     }
+    
+    
 }

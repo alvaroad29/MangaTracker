@@ -93,6 +93,17 @@ public class UserMangaEntryService(ApplicationDbContext db, IMangaSnapshotServic
         return entry ?? throw new NotFoundAppException("No se encontró ese manga en tu lista.");
     }
 
+    public async Task<MangaEntryDto?> GetByMalIdAsync(Guid userId, int malId)
+    {
+        var entry = await db.UserMangaEntries
+            .Include(e => e.MangaSnapshot)
+            .ThenInclude(s => s.MangaSnapshotGenres)
+            .ThenInclude(sg => sg.Genre)
+            .FirstOrDefaultAsync(e => e.UserId == userId && e.MangaSnapshot.MalId == malId);
+
+        return entry is null ? null : ToDto(entry, ToSnapshotDto(entry.MangaSnapshot));
+    }
+    
     private static MangaSnapshotDto ToSnapshotDto(MangaSnapshot s) => new(
         s.Id, s.MalId, s.Title, s.TitleEnglish, s.CoverImageUrl, s.Type, s.PublicationStatus, s.Synopsis,
         s.MangaSnapshotGenres.Select(sg => new GenreDto(sg.Genre.Id, sg.Genre.Name)).ToList());

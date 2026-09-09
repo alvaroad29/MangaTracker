@@ -1,0 +1,33 @@
+<div class="relative">
+    <button
+      (click)="open.set(!open())"
+      class="flex items-center gap-2 rounded-md px-2 py-1.5 text-(--color-text-muted) transition-colors hover:text-(--color-text)"
+    >
+      <span class="flex h-6 w-6 items-center justify-center rounded-full bg-(--color-surface-alt) text-xs font-medium text-(--color-accent)">
+        {{ (auth.user()?.displayName ?? '?').charAt(0).toUpperCase() }}
+      </span>
+      <span>{{ auth.user()?.displayName }}</span>
+      <span class="text-xs transition-transform" [class.rotate-180]="open()">▾</span>
+    </button>
+
+    @if (open()) {
+      <div class="absolute right-0 top-full z-10 mt-1 w-48 rounded-md border border-(--color-surface-alt) bg-(--color-surface) py-1 shadow-lg">
+        <a routerLink="/my-list" (click)="open.set(false)" class="block px-3 py-2 text-sm text-(--color-text) hover:bg-(--color-surface-alt)">
+          Mi progreso
+        </a>
+        <a routerLink="/lists" (click)="open.set(false)" class="block px-3 py-2 text-sm text-(--color-text) hover:bg-(--color-surface-alt)">
+          Mis listas
+        </a>
+        <a routerLink="/lists/followed" k class="block px-3 py-2 text-sm text-(--color-text) hover:bg-(--color-surface-alt)">
+          Listas seguidas
+        </a>
+        <div class="my-1 border-t border-(--color-surface-alt)"></div>
+        <button
+          (click)="logout()"
+          class="block w-full px-3 py-2 text-left text-sm text-(--color-danger) hover:bg-(--color-surface-alt)"
+        >
+          Salir
+        </button>
+      </div>
+    }
+  </div>

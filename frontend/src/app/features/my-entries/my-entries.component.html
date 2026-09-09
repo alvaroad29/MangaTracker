@@ -42,6 +42,10 @@
             </div>
           </div>
 
+
+        <app-add-to-list-menu [lists]="myLists()" (listPicked)="addToList(entry.id, $event)" />
+
+
           @if (entry.notes && editingId() !== entry.id) {
             <p class="text-xs text-(--color-text-muted)">{{ entry.notes }}</p>
           }

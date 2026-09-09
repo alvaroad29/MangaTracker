@@ -18,11 +18,33 @@ export const routes: Routes = [
   {
     path: 'my-list',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/my-list/my-list.component').then(m => m.MyListComponent)
+    loadComponent: () => import('./features/my-entries/my-entries.component').then(m => m.MyEntriesComponent )
   },
   {
     path: 'manga/:malId',
     loadComponent: () => import('./features/manga-detail/manga-detail.component').then(m => m.MangaDetailComponent)
+  },
+  {
+    path: 'lists',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/my-lists/my-lists.component').then(m => m.MyListsComponent)
+  },
+  {
+    path: 'lists/followed',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/followed-lists/followed-lists.component').then(m => m.FollowedListsComponent)
+  },
+  {
+    path: 'lists/:id',
+    loadComponent: () => import('./features/list-detail/list-detail.component').then(m => m.ListDetailComponent)
+  },
+  {
+    path: 'explore',
+    loadComponent: () => import('./features/explore-lists/explore-lists.component').then(m => m.ExploreListsComponent)
+  },
+  {
+    path: 'users/:id',
+    loadComponent: () => import('./features/user-profile/user-profile.component').then(m => m.UserProfileComponent)
   },
   { path: '**', redirectTo: 'search' }
 ];

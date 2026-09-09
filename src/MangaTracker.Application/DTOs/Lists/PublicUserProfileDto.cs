@@ -1,6 +1,3 @@
 ﻿namespace MangaTracker.Application.DTOs.Lists;
 
-public class PublicUserProfileDto
-{
-    
-}
+public record PublicUserProfileDto(Guid Id, string DisplayName, string? AvatarUrl);

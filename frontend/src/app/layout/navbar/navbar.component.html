@@ -5,25 +5,29 @@
     </a>
 
     <div class="flex items-center gap-6 text-sm">
-      <a routerLink="/search" routerLinkActive="text-[color:var(--color-accent)]"
-          class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
-        Buscar
+      <a
+        routerLink="/search"
+        routerLinkActive="text-(--color-accent)"
+        class="text-(--color-text-muted) transition-colors hover:text-(--color-text)"
+      >
+        Buscar manga
+      </a>
+
+      <a
+        routerLink="/explore"
+        routerLinkActive="text-(--color-accent)"
+        class="text-(--color-text-muted) transition-colors hover:text-(--color-text)"
+      >
+        Explorar listas
       </a>
 
       @if (auth.isAuthenticated()) {
-        <a routerLink="/my-list" routerLinkActive="text-[color:var(--color-accent)]"
-            class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
-          Mi lista
-        </a>
-        <span class="text-(--color-text-muted)">{{ auth.user()?.displayName }}</span>
-        <button
-          (click)="auth.logout()"
-          class="rounded-md cursor-pointer border border-(--color-surface-alt) px-3 py-1.5 text-(--color-text-muted) transition-colors hover:border-(--color-danger) hover:text-(--color-danger)">
-          Salir
-        </button>
+        <app-user-menu />
       } @else {
-        <a routerLink="/login"
-            class="rounded-md bg-(--color-accent) px-4 py-1.5 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover)">
+        <a
+          routerLink="/login"
+          class="rounded-md bg-(--color-accent) px-4 py-1.5 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover)"
+        >
           Ingresar
         </a>
       }

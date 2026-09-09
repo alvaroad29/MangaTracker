@@ -18,6 +18,22 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
     [HttpGet]
     public async Task<IActionResult> GetAll() // obtener listas de un usuario
         => Ok(await listService.GetAllAsync(User.GetUserId()));
+   
+    [HttpGet("{listId:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetDetail(Guid listId)
+    {
+        var viewerId = User.Identity?.IsAuthenticated == true ? User.GetUserId() : (Guid?)null;
+        return Ok(await listService.GetDetailAsync(viewerId, listId));
+    }
+        
+    // [HttpGet("{listId:guid}")]
+    // [AllowAnonymous]
+    // public async Task<IActionResult> GetById(Guid listId)
+    // {
+    //     var viewerId = User.Identity?.IsAuthenticated == true ? User.GetUserId() : (Guid?)null;
+    //     return Ok(await listService.GetByIdAsync(viewerId, listId));
+    // }
 
     [HttpPut("{listId:guid}")]
     public async Task<IActionResult> Update(Guid listId, UpdateMangaListRequest request)
@@ -30,10 +46,13 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
         return NoContent();
     }
 
-    [HttpGet("{listId:guid}/items")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetItems(Guid listId)
-        => Ok(await listService.GetItemsAsync(User.GetUserId(), listId));
+    // [HttpGet("{listId:guid}/items")]
+    // [AllowAnonymous]
+    // public async Task<IActionResult> GetItems(Guid listId)
+    // {
+    //     var viewerId = User.Identity?.IsAuthenticated == true ? User.GetUserId() : (Guid?)null;
+    //     return Ok(await listService.GetItemsAsync(viewerId, listId));
+    // }
 
     [HttpPost("{listId:guid}/items/{entryId:guid}")]
     public async Task<IActionResult> AddItem(Guid listId, Guid entryId)

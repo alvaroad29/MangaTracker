@@ -1,6 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { MangaEntryDto, UpdateMangaEntryRequest } from '../models/entries.models';
 import { ReadingStatus } from '../models/enums';
 
@@ -11,7 +11,6 @@ export class MangaEntryService {
   private http = inject(HttpClient);
 
   add(malId: number): Observable<MangaEntryDto> {
-
     return this.http.post<MangaEntryDto>('/api/manga-list', { malId });
   }
 
@@ -21,6 +20,12 @@ export class MangaEntryService {
       params = params.set('status', status);
     }
     return this.http.get<MangaEntryDto[]>('/api/manga-list', { params });
+  }
+
+  getByMalId(malId: number): Observable<MangaEntryDto | null> {
+    return this.http.get<MangaEntryDto>(`/api/manga-list/by-manga/${malId}`).pipe(
+      catchError((err: HttpErrorResponse) => err.status === 404 ? of(null) : throwError(() => err))
+    );
   }
 
   update(entryId: string, request: UpdateMangaEntryRequest): Observable<MangaEntryDto> {

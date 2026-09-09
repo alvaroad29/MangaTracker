@@ -70,16 +70,58 @@ public class MangaListService(ApplicationDbContext db) : IMangaListService
         await db.SaveChangesAsync();
     }
     
-    public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid? viewerUserId, Guid listId)
+    // public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid? viewerUserId, Guid listId)
+    // {
+    //     var list = await db.MangaLists.FirstOrDefaultAsync(l => l.Id == listId)
+    //                ?? throw new NotFoundAppException("No se encontró esa lista.");
+    //
+    //     var isOwner = viewerUserId.HasValue && list.UserId == viewerUserId.Value; // si es el dueño
+    //     
+    //     
+    //     if (!isOwner && !list.IsPublic) // solo entra si no es el dueño y la lista es privada 
+    //         throw new NotFoundAppException("No se encontró esa lista."); // mismo mensaje que "no existe": no delatamos que es privada
+    //
+    //     var items = await db.MangaListItems
+    //         .Include(i => i.UserMangaEntry)
+    //         .ThenInclude(e => e.MangaSnapshot)
+    //         .ThenInclude(s => s.MangaSnapshotGenres)
+    //         .ThenInclude(sg => sg.Genre)
+    //         .Where(i => i.MangaListId == listId)
+    //         .OrderByDescending(i => i.AddedAt)
+    //         .ToListAsync();
+    //
+    //     return items.Select(ToItemDto).ToList();
+    // }
+    
+    
+    // public async Task<MangaListDto> GetByIdAsync(Guid? viewerUserId, Guid listId)
+    // {
+    //     var list = await db.MangaLists.FirstOrDefaultAsync(l => l.Id == listId)
+    //                ?? throw new NotFoundAppException("No se encontró esa lista.");
+    //
+    //     var isOwner = viewerUserId.HasValue && list.UserId == viewerUserId.Value;
+    //     if (!isOwner && !list.IsPublic)
+    //         throw new NotFoundAppException("No se encontró esa lista.");
+    //
+    //     var itemCount = await db.MangaListItems.CountAsync(i => i.MangaListId == listId);
+    //     return ToDto(list, itemCount);
+    // }
+    
+    public async Task<MangaListDetailDto> GetDetailAsync(Guid? viewerUserId, Guid listId)
     {
-        var list = await db.MangaLists.FirstOrDefaultAsync(l => l.Id == listId)
-                   ?? throw new NotFoundAppException("No se encontró esa lista.");
+        var found = await (
+            from list in db.MangaLists
+            join owner in db.Users on list.UserId equals owner.Id
+            where list.Id == listId
+            select new { list, owner }
+        ).FirstOrDefaultAsync() ?? throw new NotFoundAppException("No se encontró esa lista.");
 
-        var isOwner = viewerUserId.HasValue && list.UserId == viewerUserId.Value; // si es el dueño
-        
-        
-        if (!isOwner && !list.IsPublic) // solo entra si no es el dueño y la lista es privada 
-            throw new NotFoundAppException("No se encontró esa lista."); // mismo mensaje que "no existe": no delatamos que es privada
+        var list1 = found.list;
+        var owner1 = found.owner;
+
+        var isOwner = viewerUserId.HasValue && list1.UserId == viewerUserId.Value;
+        if (!isOwner && !list1.IsPublic)
+            throw new NotFoundAppException("No se encontró esa lista.");
 
         var items = await db.MangaListItems
             .Include(i => i.UserMangaEntry)
@@ -90,24 +132,16 @@ public class MangaListService(ApplicationDbContext db) : IMangaListService
             .OrderByDescending(i => i.AddedAt)
             .ToListAsync();
 
-        return items.Select(ToItemDto).ToList();
-    }
+        var followerCount = await db.ListFollows.CountAsync(f => f.MangaListId == listId);
+        var isFollowedByMe = viewerUserId.HasValue
+                             && await db.ListFollows.AnyAsync(f => f.MangaListId == listId && f.FollowerUserId == viewerUserId.Value);
 
-    // public async Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId)
-    // {
-    //     await FindOwnedListAsync(userId, listId); // valida ownership antes de listar
-    //
-    //     var items = await db.MangaListItems
-    //         .Include(i => i.UserMangaEntry)
-    //             .ThenInclude(e => e.MangaSnapshot)
-    //                 .ThenInclude(s => s.MangaSnapshotGenres)
-    //                     .ThenInclude(sg => sg.Genre)
-    //         .Where(i => i.MangaListId == listId)
-    //         .OrderByDescending(i => i.AddedAt)
-    //         .ToListAsync();
-    //
-    //     return items.Select(ToItemDto).ToList();
-    // }
+        return new MangaListDetailDto(
+            list1.Id, list1.Name, list1.Description, list1.IsPublic,
+            owner1.Id, owner1.DisplayName, owner1.AvatarUrl,
+            followerCount, isFollowedByMe,
+            list1.CreatedAt, items.Select(ToItemDto).ToList());
+    }
 
     public async Task AddItemAsync(Guid userId, Guid listId, Guid entryId)
     {
@@ -153,7 +187,7 @@ public class MangaListService(ApplicationDbContext db) : IMangaListService
     }
 
     private static MangaListDto ToDto(MangaList l, int itemCount) =>
-        new(l.Id, l.Name, l.Description, l.IsPublic, itemCount, l.CreatedAt);
+        new(l.Id, l.Name, l.Description, l.IsPublic, itemCount, l.UserId, l.CreatedAt);
 
     private static MangaListItemDto ToItemDto(MangaListItem i)
     {

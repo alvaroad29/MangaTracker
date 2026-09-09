@@ -6,16 +6,25 @@ import { statusLabels } from '../../core/models/status-labels';
 import { MangaEntryService } from '../../core/services/manga-entry.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { FormsModule } from '@angular/forms';
+import { MangaListDto } from '../../core/models/lists.models';
+import { MangaListService } from '../../core/services/manga-list.service';
+import { tap } from 'rxjs';
+import { AddToListMenuComponent } from "../../shared/components/add-to-list-menu/add-to-list-menu.component";
 
 @Component({
-  selector: 'app-my-list',
-  imports: [FormsModule],
-  templateUrl: './my-list.component.html',
+  selector: 'app-my-entries',
+  imports: [FormsModule, AddToListMenuComponent],
+  templateUrl: './my-entries.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyListComponent {
+export class MyEntriesComponent  { // entries de un user logueado
   private entryService = inject(MangaEntryService);
   private notifications = inject(NotificationService);
+
+  private listService = inject(MangaListService);
+
+  myLists = signal<MangaListDto[]>([]);
+  addingToListFor = signal<string | null>(null);
 
   entries = signal<MangaEntryDto[]>([]);
   loading = signal(true);
@@ -43,6 +52,17 @@ export class MyListComponent {
 
   constructor() {
     this.load();
+    this.listService.getAll()
+    .pipe(
+      tap(resp =>{
+        console.log({resp})
+      }
+      )
+
+    )
+    .subscribe(
+      lists => this.myLists.set(lists)
+    ); // cargo listas del usuario
   }
 
   setFilter(status: ReadingStatus | null): void {
@@ -98,6 +118,15 @@ export class MyListComponent {
     this.entryService.delete(entryId).subscribe({
       next: () => this.entries.update(list => list.filter(e => e.id !== entryId)),
       error: (err: HttpErrorResponse) => this.notifications.show(err.error?.title ?? 'No pudimos eliminar el manga.')
+    });
+  }
+
+
+
+  addToList(entryId: string, listId: string): void {
+    this.listService.addItem(listId, entryId).subscribe({
+      next: () => this.notifications.show('Agregado a la lista.', 'success'),
+      error: (err: HttpErrorResponse) => this.notifications.show(err.error?.title ?? 'No pudimos agregarlo a la lista.')
     });
   }
 }

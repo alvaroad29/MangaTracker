@@ -1,0 +1,29 @@
+   @if (open()) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        (click)="cancel.emit()"
+      >
+        <div
+          class="w-full max-w-sm rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-6"
+          (click)="$event.stopPropagation()"
+        >
+          <h2 class="font-display text-lg">{{ title() }}</h2>
+          <p class="mt-2 text-sm text-(--color-text-muted)">{{ message() }}</p>
+          <div class="mt-5 flex justify-end gap-2">
+            <button
+              (click)="cancel.emit()"
+              class="rounded-md border border-(--color-surface-alt) px-4 py-1.5 text-sm text-(--color-text-muted)"
+            >
+              Cancelar
+            </button>
+            <button
+              (click)="confirm.emit()"
+              [disabled]="confirming()"
+              class="rounded-md bg-(--color-danger) px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {{ confirming() ? 'Procesando...' : confirmLabel() }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }

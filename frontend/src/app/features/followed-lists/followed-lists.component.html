@@ -1,0 +1,15 @@
+<div class="flex flex-col gap-6">
+  <h1 class="font-display text-2xl text-(--color-accent)">LISTAS QUE SIGO</h1>
+
+  @if (loading()) {
+    <p class="text-(--color-text-muted)">Cargando...</p>
+  } @else if (lists().length === 0) {
+    <p class="text-(--color-text-muted)">Todavía no seguís ninguna lista. Explorá listas públicas para encontrar algunas.</p>
+  }
+
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    @for (list of lists(); track list.id) {
+      <app-list-card [list]="list" (follow)="unfollow(list)" />
+    }
+  </div>
+</div>

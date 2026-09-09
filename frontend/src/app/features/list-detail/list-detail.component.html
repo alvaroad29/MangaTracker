@@ -1,0 +1,65 @@
+@if (loading()) {
+  <p class="text-(--color-text-muted)">Cargando...</p>
+} @else if (detail(); as detail) {
+  <div class="flex flex-col gap-6">
+    <a routerLink="/lists" class="w-fit text-sm text-(--color-text-muted) hover:text-(--color-accent)">← Mis listas</a>
+
+    <div class="flex flex-col gap-2">
+      <h1 class="font-display text-2xl text-(--color-accent)">{{ detail.name }}</h1>
+
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-(--color-text-muted)">
+        <a [routerLink]="['/users', detail.ownerId]" class="hover:text-(--color-accent)">
+          {{ detail.ownerDisplayName }}
+        </a>
+        <span>·</span>
+        <span>{{ detail.items.length }} mangas</span>
+        <span>·</span>
+        <span>{{ detail.followerCount }} seguidores</span>
+      </div>
+
+      @if (detail.description) {
+        <p class="text-sm text-(--color-text-muted)">{{ detail.description }}</p>
+      }
+
+      @if (!isOwnedByMe()) {
+        <button
+          (click)="toggleFollow()"
+          class="mt-2 w-fit rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+          [class]="detail.isFollowedByMe
+            ? 'border border-(--color-surface-alt) text-(--color-text-muted)'
+            : 'bg-(--color-accent) text-[#14151a]'"
+        >
+          {{ detail.isFollowedByMe ? 'Siguiendo ✓' : 'Seguir' }}
+        </button>
+      }
+    </div>
+
+    <div class="flex flex-col gap-3">
+      @for (item of detail.items; track item.id) {
+        <div class="flex items-center gap-4 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-3">
+          <a [routerLink]="['/manga', item.entry.manga.malId]">
+            <img [src]="item.entry.manga.coverImageUrl" [alt]="item.entry.manga.title" class="h-20 w-14 rounded object-cover" />
+          </a>
+
+          <div class="flex-1">
+            <p class="text-sm font-medium">{{ item.entry.manga.title }}</p>
+            <p class="text-xs text-(--color-text-muted)">
+              {{ statusLabels[item.entry.status] }} · Cap. {{ item.entry.lastChapterRead }}
+            </p>
+            @if (item.entry.notes) {
+              <p class="mt-1 text-xs text-(--color-text-muted)">{{ item.entry.notes }}</p>
+            }
+          </div>
+
+          @if (isOwnedByMe()) {
+            <button (click)="removeItem(item.entry.id)" class="text-xs text-(--color-danger) hover:underline">
+              Quitar
+            </button>
+          }
+        </div>
+      } @empty {
+        <p class="text-(--color-text-muted)">Esta lista todavía no tiene mangas.</p>
+      }
+    </div>
+  </div>
+}

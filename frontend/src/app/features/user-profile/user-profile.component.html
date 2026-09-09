@@ -1,0 +1,34 @@
+<div class="flex flex-col gap-6">
+  <div class="flex items-center gap-4 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-5">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-(--color-surface-alt) text-xl font-medium text-(--color-accent)">
+      {{ (profile()?.displayName ?? '?').charAt(0).toUpperCase() }}
+    </div>
+
+    <div>
+      <p class="text-xs uppercase tracking-wide text-(--color-text-muted)">
+        {{ isMyProfile() ? 'Tu perfil' : 'Perfil de usuario' }}
+      </p>
+      <h1 class="font-display text-xl">{{ profile()?.displayName ?? 'Usuario' }}</h1>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="mb-3 text-sm font-medium text-(--color-text-muted)">
+      {{ isMyProfile() ? 'Tus listas públicas' : 'Listas públicas' }}
+    </h2>
+
+    @if (loading()) {
+      <p class="text-(--color-text-muted)">Cargando...</p>
+    } @else if (lists().length === 0) {
+      <p class="text-(--color-text-muted)">
+        {{ isMyProfile() ? 'Todavía no hiciste ninguna lista pública.' : 'Este usuario no tiene listas públicas.' }}
+      </p>
+    }
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      @for (list of lists(); track list.id) {
+        <app-list-card [list]="list" (follow)="toggleFollow(list)" />
+      }
+    </div>
+  </div>
+</div>

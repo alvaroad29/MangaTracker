@@ -19,6 +19,13 @@ public class MangaListEntriesController(IUserMangaEntryService entryService) : C
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ReadingStatus? status)
         => Ok(await entryService.GetAllAsync(User.GetUserId(), status));
+    
+    [HttpGet("by-manga/{malId:int}")]
+    public async Task<IActionResult> GetByMalId(int malId)
+    {
+        var entry = await entryService.GetByMalIdAsync(User.GetUserId(), malId);
+        return entry is null ? NotFound() : Ok(entry);
+    }
 
     [HttpPut("{entryId:guid}")]
     public async Task<IActionResult> Update(Guid entryId, UpdateMangaEntryRequest request)

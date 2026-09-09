@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-6">
+  <h1 class="font-display text-2xl text-(--color-accent)">EXPLORAR LISTAS</h1>
+
+  <input
+    type="text"
+    placeholder="Buscar listas por nombre..."
+    (input)="onSearch($any($event.target).value)"
+    class="w-full max-w-xl rounded-md border border-(--color-surface-alt) bg-(--color-surface) px-4 py-2.5 text-sm outline-none focus:border-(--color-accent)"
+  />
+
+  @if (loading()) {
+    <p class="text-(--color-text-muted)">Cargando...</p>
+  } @else if (results().length === 0) {
+    <p class="text-(--color-text-muted)">No encontramos listas públicas.</p>
+  }
+
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    @for (list of results(); track list.id) {
+      <app-list-card [list]="list" (follow)="toggleFollow(list)" />
+    }
+  </div>
+</div>

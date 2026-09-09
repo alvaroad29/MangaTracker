@@ -1,4 +1,4 @@
-@if (loading()) {
+@if (loading() ) {
   <p class="text-(--color-text-muted)">Cargando...</p>
 } @else if (manga(); as manga) {
   <div class="flex flex-col gap-6 sm:flex-row">
@@ -25,14 +25,33 @@
       }
 
       @if (auth.isAuthenticated()) {
-        <button
-          (click)="addToMyList()"
-          [disabled]="adding()"
-          class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
-        >
-          {{ adding() ? 'Agregando...' : 'Agregar a mi lista' }}
-        </button>
+        @if (loadingTrackedStatus()) {
+          <div class="mt-2 h-10 w-40 animate-pulse rounded-md bg-(--color-surface-alt)"></div>
+        } @else if (trackedEntry(); as entry) {
+          <div class="mt-2 flex items-center gap-3">
+            <button
+              (click)="showUntrackConfirm.set(true)"
+               class="w-fit rounded-md border border-(--color-surface-alt) px-5 py-2 text-sm font-medium text-(--color-text-muted) transition-colors hover:border-(--color-danger) hover:text-(--color-danger)">En tu lista</button>
+            <span class="text-xs text-(--color-text-muted)">
+              {{ statusLabels[entry.status] }} · Cap. {{ entry.lastChapterRead }}
+            </span>
+          </div>
+        } @else {
+          <button (click)="addToMyList()" [disabled]="adding()" class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50">
+            {{ adding() ? 'Agregando...' : 'Agregar a mi lista' }}
+          </button>
+        }
       }
     </div>
   </div>
+
+  <app-confirm-modal
+    [open]="showUntrackConfirm()"
+    [confirming]="removing()"
+    title="Dejar de seguir este manga"
+    message="Se va a borrar tu progreso (capítulo, notas, estado) para este manga. ¿Confirmás?"
+    confirmLabel="Sí, quitar"
+    (confirm)="confirmUntrack()"
+    (cancel)="showUntrackConfirm.set(false)"
+  />
 }

@@ -1,0 +1,65 @@
+<div class="flex flex-col gap-6">
+  <div class="flex items-center justify-between">
+    <h1 class="font-display text-2xl text-(--color-accent)">MIS LISTAS</h1>
+    <button
+      (click)="showCreateForm.set(!showCreateForm())"
+      class="rounded-md bg-(--color-accent) px-4 py-1.5 text-sm font-medium text-[#14151a] hover:bg-(--color-accent-hover)"
+    >
+      + Nueva lista
+    </button>
+  </div>
+
+  @if (showCreateForm()) {
+    <div class="flex flex-col gap-3 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-4">
+      <input
+        type="text"
+        placeholder="Nombre de la lista"
+        [ngModel]="newName()"
+        (ngModelChange)="newName.set($event)"
+        class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-sm"
+      />
+      <textarea
+        placeholder="Descripción (opcional)"
+        [ngModel]="newDescription()"
+        (ngModelChange)="newDescription.set($event)"
+        rows="2"
+        class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-sm"
+      ></textarea>
+      <label class="flex items-center gap-2 text-sm text-(--color-text-muted)">
+        <input type="checkbox" [ngModel]="newIsPublic()" (ngModelChange)="newIsPublic.set($event)" />
+        Hacer pública (otros usuarios podrán verla y seguirla)
+      </label>
+      <button
+        (click)="create()"
+        [disabled]="creating()"
+        class="w-fit rounded-md bg-(--color-accent) px-4 py-1.5 text-sm font-medium text-[#14151a] disabled:opacity-50"
+      >
+        {{ creating() ? 'Creando...' : 'Crear' }}
+      </button>
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="text-(--color-text-muted)">Cargando...</p>
+  } @else if (lists().length === 0) {
+    <p class="text-(--color-text-muted)">Todavía no creaste ninguna lista.</p>
+  }
+
+  <div class="flex flex-col gap-3">
+    @for (list of lists(); track list.id) {
+      <div class="flex items-center justify-between rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-4">
+        <a [routerLink]="['/lists', list.id]" class="flex flex-col">
+          <span class="font-medium hover:text-(--color-accent)">{{ list.name }}</span>
+          <span class="text-xs text-(--color-text-muted)">{{ list.itemCount }} mangas</span>
+        </a>
+
+        <div class="flex items-center gap-3 text-xs">
+          <button (click)="togglePublic(list)" class="text-(--color-text-muted) hover:text-(--color-text)">
+            {{ list.isPublic ? '🌐 Pública' : '🔒 Privada' }}
+          </button>
+          <button (click)="remove(list.id)" class="text-(--color-danger) hover:underline">Borrar</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

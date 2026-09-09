@@ -2,9 +2,11 @@ import type { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
 
   const token = authService.getAccessToken();
   const authReq = token
@@ -17,6 +19,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // No reintentamos el refresh del propio endpoint de refresh, para evitar loop infinito
       if (error.status === 401 && !req.url.includes('/api/auth/refresh')) {
+         if (!authService.getRefreshToken()) {
+          authService.logout();
+          router.navigateByUrl('/login');
+          return throwError(() => error);
+        }
+
         return authService.refresh().pipe(
           switchMap(res => {
             const retryReq = req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } });
