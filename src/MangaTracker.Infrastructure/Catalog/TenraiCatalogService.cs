@@ -18,6 +18,7 @@ public class TenraiCatalogService(ITenrai tenrai, CatalogMapper mapper, IMemoryC
         
         var config = new MangaSearchConfig
         {
+            // tamaño por defecto = 25
             Query = query,
             Page = page
         };
@@ -26,8 +27,11 @@ public class TenraiCatalogService(ITenrai tenrai, CatalogMapper mapper, IMemoryC
 
         var response = new MangaCatalogSearchResponse(
             result.Data.Select(mapper.ToSearchResultDto).ToList(),
-            page,
-            result.Pagination?.HasNextPage ?? false);
+            page, // numero de pagina
+            result.Pagination?.HasNextPage ?? false, // hay siguiente pagina
+            result.Pagination?.LastVisiblePage, // ultima pagina
+            result.Pagination?.Items.Total // cantidad total de resultados
+            );
 
         cache.Set(cacheKey, response, CacheTtl);
         return response;

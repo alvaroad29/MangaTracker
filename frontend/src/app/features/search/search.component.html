@@ -1,33 +1,57 @@
 <div class="flex flex-col gap-6">
   <div>
-    <h1 class="font-display text-2xl text-(--color-accent)">BUSCAR MANGA</h1>
-    <input
-      type="text"
-      placeholder="Ej: Berserk, One Piece, Chainsaw Man..."
-      [value]="query()"
-      (input)="onInput($any($event.target).value)"
-      class="mt-4 w-full max-w-xl rounded-md border border-(--color-surface-alt) bg-(--color-surface) px-4 py-2.5 text-(--color-text) outline-none focus:border-(--color-accent)"
-    />
+    <h1 data-results-container class="font-display text-2xl text-(--color-accent)">BUSCAR MANGA</h1>
+
+    <div class="mt-4 flex max-w-xl gap-2">
+      <input
+        type="text"
+        placeholder="Ej: Berserk, One Piece, Chainsaw Man..."
+        [value]="query()"
+        (input)="onInput($any($event.target).value)"
+        (keydown.enter)="submit()"
+        class="flex-1 rounded-md border border-(--color-surface-alt) bg-(--color-surface) px-4 py-2.5 text-(--color-text) outline-none focus:border-(--color-accent)"
+      />
+      <button
+        (click)="submit()"
+        class="rounded-md bg-(--color-accent) px-5 py-2.5 text-sm font-medium text-[#14151a] hover:bg-(--color-accent-hover)"
+      >
+        Buscar
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
-    <p class="text-(--color-text-muted)">Buscando...</p>
-  } @else if (searched() && results().length === 0) {
-    <p class="text-(--color-text-muted)">No encontramos resultados para "{{ query() }}".</p>
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        <app-manga-card-skeleton />
+      }
+    </div>
+  } @else if (searched() && searchResponse()?.items?.length === 0) {
+    <p class="text-(--color-text-muted)">No encontramos resultados para "{{ submittedQuery() }}".</p>
   }
 
-  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-    @for (manga of results(); track manga.malId) {
-      <a
-        [routerLink]="['/manga', manga.malId]"
-        class="group flex flex-col overflow-hidden rounded-lg border border-(--color-surface-alt) bg-(--color-surface) transition-colors hover:border-(--color-accent)"
-      >
-        <img [src]="manga.coverImageUrl" [alt]="manga.title" class="aspect-2/3 w-full object-cover" />
-        <div class="p-3">
-          <p class="line-clamp-2 text-sm font-medium">{{ manga.title }}</p>
-          <p class="mt-1 text-xs text-(--color-text-muted)">{{ typeLabels[manga.type] }}</p>
-        </div>
-      </a>
+  @if (searchResponse(); as response) {
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      @for (manga of response.items; track manga.malId) {
+        <a
+          [routerLink]="['/manga', manga.malId]"
+          class="group flex flex-col overflow-hidden rounded-lg border border-(--color-surface-alt) bg-(--color-surface) transition-colors hover:border-(--color-accent)"
+        >
+          <img [src]="manga.coverImageUrl" [alt]="manga.title" class="aspect-2/3 w-full object-cover" />
+          <div class="p-3">
+            <p class="line-clamp-2 text-sm font-medium">{{ manga.title }}</p>
+            <p class="mt-1 text-xs text-(--color-text-muted)">{{ typeLabels[manga.type] }}</p>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (response.lastVisiblePage > 1) {
+      <shared-pagination
+        [currentPage]="response.currentPage"
+        [lastVisiblePage]="response.lastVisiblePage"
+        [totalItemsCount]="response.totalItemsCount"
+      />
     }
-  </div>
+  }
 </div>

@@ -18,6 +18,8 @@ export interface MangaCatalogSearchResponse {
   items: MangaCatalogSearchResultDto[];
   currentPage: number;
   hasNextPage: boolean;
+  lastVisiblePage: number;
+  totalItemsCount: number;
 }
 
 export interface MangaCatalogDetailDto extends MangaCatalogSearchResultDto {

@@ -1,0 +1,25 @@
+<div class="relative">
+  <button
+    (click)="open.set(!open())"
+    class="flex h-9 w-9 items-center justify-center rounded-md border border-(--color-surface-alt) text-sm text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent)"
+  >
+    ···
+  </button>
+
+  @if (open()) {
+    <div class="absolute left-1/2 top-full z-10 mt-1 flex -translate-x-1/2 items-center gap-1 rounded-md border border-(--color-surface-alt) bg-(--color-surface) p-2 shadow-lg">
+      <input
+        type="number"
+        [min]="1"
+        [max]="maxPage()"
+        [(ngModel)]="value"
+        (keydown.enter)="submit()"
+        placeholder="Página"
+        class="w-16 rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm"
+      />
+      <button (click)="submit()" class="rounded-md bg-(--color-accent) px-2 py-1 text-xs font-medium text-[#14151a]">
+        Ir
+      </button>
+    </div>
+  }
+</div>

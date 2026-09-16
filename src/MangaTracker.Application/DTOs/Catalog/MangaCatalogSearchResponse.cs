@@ -3,4 +3,7 @@
 public record MangaCatalogSearchResponse(
     IReadOnlyList<MangaCatalogSearchResultDto> Items,
     int CurrentPage,
-    bool HasNextPage);
+    bool HasNextPage,
+    int? LastVisiblePage,
+    int? TotalItemsCount
+    );

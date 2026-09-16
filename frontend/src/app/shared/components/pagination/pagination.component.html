@@ -1,0 +1,43 @@
+<nav class="flex flex-wrap items-center justify-center gap-1" aria-label="Paginación">
+  @if (hasPrevPage()) {
+    <button
+      (click)="navigateToPage(activePage() - 1)"
+      class="flex h-9 items-center gap-1 rounded-md border border-(--color-surface-alt) px-3 text-sm text-(--color-text-muted) transition-colors hover:border-(--color-accent) hover:text-(--color-accent) cursor-pointer"
+      aria-label="Página anterior"
+    >
+      <span>&laquo;</span>
+      <span class="hidden sm:inline">Anterior</span>
+    </button>
+  }
+
+  @for (page of pagesList(); track page) {
+    @if (page === 'ellipsis-left' || page === 'ellipsis-right') {
+      <app-page-jump-dropdown [maxPage]="lastVisiblePage()" (go)="navigateToPage($event)" />
+    } @else {
+      <button
+        (click)="navigateToPage(page)"
+        class="flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium transition-colors"
+        [class]="activePage() === page
+          ? 'border-(--color-accent) bg-(--color-accent) text-[#14151a]'
+          : 'border-(--color-surface-alt) text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent) cursor-pointer'"
+      >
+        {{ page }}
+      </button>
+    }
+  }
+
+  @if (hasNextPage()) {
+    <button
+      (click)="navigateToPage(activePage() + 1)"
+      class="flex h-9 items-center gap-1 rounded-md border border-(--color-surface-alt) px-3 text-sm text-(--color-text-muted) transition-colors hover:border-(--color-accent) hover:text-(--color-accent) cursor-pointer"
+      aria-label="Página siguiente"
+    >
+      <span class="hidden sm:inline">Siguiente</span>
+      <span>&raquo;</span>
+    </button>
+  }
+</nav>
+
+@if (totalItemsCount(); as total) {
+  <p class="mt-2 text-center text-xs text-(--color-text-muted)">{{ total }} resultados</p>
+}
