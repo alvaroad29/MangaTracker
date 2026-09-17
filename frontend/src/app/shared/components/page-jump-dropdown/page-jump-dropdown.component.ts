@@ -14,17 +14,17 @@ export class PageJumpDropdownComponent {
   go = output<number>();
 
   open = signal(false);
-  value: number | null = null;
+  value = signal<number | null>(null);
 
   submit(): void {
-    let page = this.value;
+    let page = this.value();
     if (page === null || isNaN(page)) page = 1;
     page = Math.trunc(page);
     page = Math.max(1, Math.min(page, this.maxPage()));
 
     this.go.emit(page);
     this.open.set(false);
-    this.value = null;
+    this.value.set(null);
   }
 
   @HostListener('document:click', ['$event.target'!])

@@ -1,7 +1,7 @@
 <div class="relative">
   <button
     (click)="open.set(!open())"
-    class="flex h-9 w-9 items-center justify-center rounded-md border border-(--color-surface-alt) text-sm text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent)"
+    class="flex h-9 w-9 items-center justify-center rounded-md border border-(--color-surface-alt) text-sm text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent) cursor-pointer"
   >
     ···
   </button>
@@ -12,7 +12,8 @@
         type="number"
         [min]="1"
         [max]="maxPage()"
-        [(ngModel)]="value"
+        [ngModel]="value()"
+        (ngModelChange)="value.set($event)"
         (keydown.enter)="submit()"
         placeholder="Página"
         class="w-16 rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm"

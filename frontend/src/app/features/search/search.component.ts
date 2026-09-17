@@ -1,18 +1,15 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError, tap } from 'rxjs';
-import { MangaCatalogSearchResponse, MangaCatalogSearchResultDto } from '../../core/models/catalog.models';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { MangaCatalogSearchResponse } from '../../core/models/catalog.models';
 import { typeLabels } from '../../core/models/status-labels';
 import { CatalogService } from '../../core/services/catalog.service';
 import { Router, RouterLink } from '@angular/router';
 import { PaginationComponent } from "../../shared/components/pagination/pagination.component";
 import { PaginationService } from '../../shared/components/pagination/pagination.service';
-import { ListCardSkeletonComponent } from "../../shared/components/list-card-skeleton/list-card-skeleton.component";
 import { MangaCardSkeletonComponent } from "../../shared/components/manga-card-skeleton/manga-card-skeleton.component";
 
 @Component({
   selector: 'app-search',
-  imports: [RouterLink, PaginationComponent, ListCardSkeletonComponent, MangaCardSkeletonComponent],
+  imports: [RouterLink, PaginationComponent, MangaCardSkeletonComponent],
   templateUrl: './search.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
