@@ -27,8 +27,8 @@
       @if (auth.isAuthenticated()) {
         @if (loadingTrackedStatus()) {
           <div class="mt-2 h-10 w-40 animate-pulse rounded-md bg-(--color-surface-alt)"></div>
-        } @else if (trackedEntry(); as entry) {
-          <div class="mt-2 flex items-center gap-3">
+        <!-- } @else if (trackedEntry(); as entry) { -->
+          <!-- <div class="mt-2 flex items-center gap-3">
             <button
               (click)="showUntrackConfirm.set(true)"
               class="flex items-center gap-1 rounded-md border border-(--color-surface-alt)
@@ -39,9 +39,11 @@
             <span class="text-xs text-(--color-text-muted)">
               {{ statusLabels[entry.status] }} · Cap. {{ entry.lastChapterRead }}
             </span>
-          </div>
+          </div> -->
         } @else {
             <app-add-manga-entry-menu
+              (removeEntry)="showUntrackConfirm.set(true)"
+              [statusEntry]="trackedEntry()?.status"
               [loading]="adding()"
               (statusPicked)="addToMyList($event)"
             />

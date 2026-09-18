@@ -7,7 +7,7 @@ import { typeLabels, publicationStatusLabels, statusLabels } from '../../core/mo
 import { CatalogService } from '../../core/services/catalog.service';
 import { MangaEntryService } from '../../core/services/manga-entry.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { MangaEntryDto } from '../../core/models/entries.models';
+import { MangaEntryDto, UpdateMangaEntryRequest } from '../../core/models/entries.models';
 import { ConfirmModalComponent } from "../../shared/components/confirm-modal/confirm-modal.component";
 import { ReadingStatus } from '../../core/models/enums';
 import { AddMangaEntryMenuComponent } from '../../shared/components/add-manga-entry-menu/add-manga-entry-menu.component';
@@ -70,18 +70,44 @@ export class MangaDetailComponent {
 
     if (!manga) return;
 
+
+    const currentEntry = this.trackedEntry();
+    if (currentEntry && currentEntry.status === status) return;
+
     this.adding.set(true);
-    this.entryService.add(manga.malId, status).subscribe({
-      next: (entry) => {
-        this.adding.set(false);
-        this.notifications.show('Agregado a tus seguidos.', 'success');
-        this.trackedEntry.set(entry);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.adding.set(false);
-        this.notifications.show(err.error?.title ?? 'No pudimos seguir el manga.');
-      }
-    });
+    
+    if (this.trackedEntry()) {
+      const request: UpdateMangaEntryRequest = {
+        status,
+        lastChapterRead: this.trackedEntry()!.lastChapterRead,
+        score: this.trackedEntry()!.score,
+        notes: this.trackedEntry()!.notes
+      };
+
+      this.entryService.update(this.trackedEntry()!.id, request).subscribe({
+        next: (entry) => {
+          this.adding.set(false);
+          this.notifications.show('Estado actualizado', 'success');
+          this.trackedEntry.set(entry);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.adding.set(false);
+          this.notifications.show(err.error?.title ?? 'No se pudo cambiar el estado.');
+        }
+      })
+    }else{
+      this.entryService.add(manga.malId, status).subscribe({
+        next: (entry) => {
+          this.adding.set(false);
+          this.notifications.show('Agregado a tus seguidos.', 'success');
+          this.trackedEntry.set(entry);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.adding.set(false);
+          this.notifications.show(err.error?.title ?? 'No pudimos seguir el manga.');
+        }
+      });
+    }
   }
 
   confirmUntrack(): void {

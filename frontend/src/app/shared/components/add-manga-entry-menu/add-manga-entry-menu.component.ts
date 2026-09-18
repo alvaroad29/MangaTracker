@@ -15,6 +15,9 @@ export class AddMangaEntryMenuComponent {
 
   loading = input(false);
 
+  statusEntry = input<ReadingStatus>(); // status en caso de tener uno elegido
+  removeEntry = output<void>();
+
   statusLabels = statusLabels;
   statusOptions = [ // opciones para elegir
     { label: statusLabels[ReadingStatus.Reading], value: ReadingStatus.Reading },
@@ -22,12 +25,13 @@ export class AddMangaEntryMenuComponent {
     { label: statusLabels[ReadingStatus.OnHold], value: ReadingStatus.OnHold },
     { label: statusLabels[ReadingStatus.Completed], value: ReadingStatus.Completed },
     { label: statusLabels[ReadingStatus.Dropped], value: ReadingStatus.Dropped }
+
   ];
 
   open = signal(false);
 
   pick(statusOption: ReadingStatus): void { // emito el status elegido
-    if (this.loading()) return;
+    if (this.loading() || this.statusEntry() === statusOption) return;
 
     this.statusPicked.emit(statusOption);
     this.open.set(false);
@@ -36,6 +40,11 @@ export class AddMangaEntryMenuComponent {
   toggleDropdown(): void {
     // if (this.loading()) return; // Prevenir abrir durante carga
     this.open.set(!this.open());
+  }
+
+  remove(): void {
+    this.removeEntry.emit();
+    this.open.set(false);
   }
 
   @HostListener('document:click', ['$event.target'!])

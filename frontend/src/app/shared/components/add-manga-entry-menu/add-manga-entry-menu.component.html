@@ -1,37 +1,54 @@
- <div class="relative">
+<div class="relative">
   <button
     (click)="toggleDropdown()"
     [disabled]="loading()"
-    class="flex items-center gap-1 text-xs text-(--color-accent-2) cursor-pointer
-          disabled:opacity-50 disabled:no-underline
-           disabled:cursor-not-allowed
-            rounded-md border border-(--color-surface-alt)
-            hover:border-(--color-accent) hover:text-(--color-accent)
-            transition-colors px-3 py-1.5
-          "
+    class="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+    [class]="statusEntry()
+      ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+      : 'border-(--color-surface-alt) text-(--color-accent-2) hover:border-(--color-accent) hover:text-(--color-accent)'"
   >
     @if (loading()) {
-        <!-- Estado de carga -->
-        <svg class="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>Agregando...</span>
+      <svg class="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span>Guardando...</span>
+    } @else {
+      @if (statusEntry(); as status) {
+        <span class="h-1.5 w-1.5 rounded-full bg-(--color-accent)"></span>
+        <span>{{ statusLabels[status] }}</span>
       } @else {
-        <!-- Estado normal -->
         <span>+ Empezar a seguir</span>
-        <span class="text-xs transition-transform" [class.rotate-180]="open()">▾</span>
       }
+      <span class="transition-transform" [class.rotate-180]="open()">▾</span>
+    }
   </button>
 
   @if (open() && !loading()) {
     <div class="absolute left-0 top-full z-10 mt-1 w-48 rounded-md border border-(--color-surface-alt) bg-(--color-surface) py-1 shadow-lg">
-      @for (status of statusOptions; track status) {
+      @for (status of statusOptions; track status.value) {
         <button
           (click)="pick(status.value)"
-          class="block w-full px-3 py-1.5 text-left text-sm hover:bg-(--color-surface-alt) cursor-pointer"
+          [disabled]="statusEntry() === status.value"
+          class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition-colors disabled:cursor-default"
+          [class]="statusEntry() === status.value
+            ? 'bg-(--color-accent)/10 text-(--color-accent)'
+            : 'text-(--color-text) hover:bg-(--color-surface-alt) cursor-pointer'"
         >
-          {{ status.label }}
+          <span>{{ status.label }}</span>
+          @if (statusEntry() === status.value) {
+            <span class="text-(--color-accent)">✓</span>
+          }
+        </button>
+      }
+
+      @if (statusEntry()) {
+        <div class="my-1 border-t border-(--color-surface-alt)"></div>
+        <button
+          (click)="remove()"
+          class="block w-full px-3 py-1.5 text-left text-sm text-(--color-danger) hover:bg-(--color-surface-alt) cursor-pointer"
+        >
+          Quitar de lista
         </button>
       }
     </div>
