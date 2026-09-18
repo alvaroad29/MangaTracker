@@ -31,16 +31,25 @@
           <div class="mt-2 flex items-center gap-3">
             <button
               (click)="showUntrackConfirm.set(true)"
-               class="w-fit rounded-md border border-(--color-surface-alt) px-5 py-2 text-sm font-medium text-(--color-text-muted) transition-colors hover:border-(--color-danger) hover:text-(--color-danger)">En tu lista</button>
+              class="flex items-center gap-1 rounded-md border border-(--color-surface-alt)
+                    px-3 py-1.5 text-xs text-(--color-text-muted) transition-colors
+                    hover:border-(--color-danger) hover:text-(--color-danger)">
+              <span> En tu lista</span>
+            </button>
             <span class="text-xs text-(--color-text-muted)">
               {{ statusLabels[entry.status] }} · Cap. {{ entry.lastChapterRead }}
             </span>
           </div>
         } @else {
-          <button (click)="addToMyList()" [disabled]="adding()" class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50">
-            {{ adding() ? 'Agregando...' : 'Agregar a mi lista' }}
-          </button>
+            <app-add-manga-entry-menu
+              [loading]="adding()"
+              (statusPicked)="addToMyList($event)"
+            />
         }
+          <!-- <button (click)="addToMyList()" [disabled]="adding()" class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50 cursor-pointer">
+            {{ adding() ? 'Agregando...' : 'Agregar a mi lista' }}
+          </button> -->
+
       }
     </div>
   </div>

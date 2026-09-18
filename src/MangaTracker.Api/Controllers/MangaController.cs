@@ -25,11 +25,11 @@ public class MangaController(IMangaCatalogService catalogService) : ControllerBa
         return manga is null ? NotFound() : Ok(manga);
     }
     
-    [HttpPost("{malId:int}/snapshot")]
-    [Authorize] // requiere estar logueado — no tiene sentido crear snapshots sin usuario detrás
-    public async Task<IActionResult> GetOrCreateSnapshot(int malId, [FromServices] IMangaSnapshotService snapshotService)
-    {
-        var snapshot = await snapshotService.GetOrCreateAsync(malId);
-        return Ok(snapshot);
-    }
+    // [HttpPost("{malId:int}/snapshot")]
+    // [Authorize] // requiere estar logueado — no tiene sentido crear snapshots sin usuario detrás
+    // public async Task<IActionResult> GetOrCreateSnapshot(int malId, [FromServices] IMangaSnapshotService snapshotService)
+    // {
+    //     var snapshot = await snapshotService.GetOrCreateAsync(malId);
+    //     return Ok(snapshot);
+    // }
 }

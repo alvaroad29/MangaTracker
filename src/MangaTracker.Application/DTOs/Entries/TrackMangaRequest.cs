@@ -2,7 +2,7 @@
 
 namespace MangaTracker.Application.DTOs.Entries;
 
-public record AddMangaToListRequest(
+public record TrackMangaRequest(
     int MalId,
     ReadingStatus Status
     );

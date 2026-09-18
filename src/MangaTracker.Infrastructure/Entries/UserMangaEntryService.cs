@@ -11,7 +11,7 @@ namespace MangaTracker.Infrastructure.Entries;
 
 public class UserMangaEntryService(ApplicationDbContext db, IMangaSnapshotService snapshotService) : IUserMangaEntryService
 {
-    public async Task<MangaEntryDto> AddAsync(Guid userId, int malId)
+    public async Task<MangaEntryDto> AddAsync(Guid userId, int malId, ReadingStatus status)
     {
         var snapshot = await snapshotService.GetOrCreateAsync(malId);
 
@@ -26,7 +26,7 @@ public class UserMangaEntryService(ApplicationDbContext db, IMangaSnapshotServic
             Id = Guid.NewGuid(),
             UserId = userId,
             MangaSnapshotId = snapshot.Id,
-            Status = ReadingStatus.PlanToRead,
+            Status = status,
             LastChapterRead = 0,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

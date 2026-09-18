@@ -13,8 +13,8 @@ namespace MangaTracker.Api.Controllers;
 public class MangaListEntriesController(IUserMangaEntryService entryService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Add(AddMangaToListRequest request)
-        => Ok(await entryService.AddAsync(User.GetUserId(), request.MalId));
+    public async Task<IActionResult> Add(TrackMangaRequest request)
+        => Ok(await entryService.AddAsync(User.GetUserId(), request.MalId, request.Status));
 
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ReadingStatus? status)

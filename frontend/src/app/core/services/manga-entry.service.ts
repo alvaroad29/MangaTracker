@@ -10,8 +10,8 @@ import { ReadingStatus } from '../models/enums';
 export class MangaEntryService {
   private http = inject(HttpClient);
 
-  add(malId: number): Observable<MangaEntryDto> {
-    return this.http.post<MangaEntryDto>('/api/manga-list', { malId });
+  add(malId: number, status: ReadingStatus): Observable<MangaEntryDto> {
+    return this.http.post<MangaEntryDto>('/api/manga-list', { malId, status });
   }
 
   getAll(status?: ReadingStatus | null): Observable<MangaEntryDto[]> {

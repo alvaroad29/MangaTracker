@@ -7,7 +7,7 @@ import { MangaListDto } from '../../../core/models/lists.models';
   templateUrl: './add-to-list-menu.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddToListMenuComponent {
+export class AddToListMenuComponent { // recibe la lista
   private elementRef = inject(ElementRef);
 
   lists = input.required<MangaListDto[]>();

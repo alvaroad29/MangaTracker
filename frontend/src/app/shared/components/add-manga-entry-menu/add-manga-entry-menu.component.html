@@ -1,0 +1,39 @@
+ <div class="relative">
+  <button
+    (click)="toggleDropdown()"
+    [disabled]="loading()"
+    class="flex items-center gap-1 text-xs text-(--color-accent-2) cursor-pointer
+          disabled:opacity-50 disabled:no-underline
+           disabled:cursor-not-allowed
+            rounded-md border border-(--color-surface-alt)
+            hover:border-(--color-accent) hover:text-(--color-accent)
+            transition-colors px-3 py-1.5
+          "
+  >
+    @if (loading()) {
+        <!-- Estado de carga -->
+        <svg class="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Agregando...</span>
+      } @else {
+        <!-- Estado normal -->
+        <span>+ Empezar a seguir</span>
+        <span class="text-xs transition-transform" [class.rotate-180]="open()">▾</span>
+      }
+  </button>
+
+  @if (open() && !loading()) {
+    <div class="absolute left-0 top-full z-10 mt-1 w-48 rounded-md border border-(--color-surface-alt) bg-(--color-surface) py-1 shadow-lg">
+      @for (status of statusOptions; track status) {
+        <button
+          (click)="pick(status.value)"
+          class="block w-full px-3 py-1.5 text-left text-sm hover:bg-(--color-surface-alt) cursor-pointer"
+        >
+          {{ status.label }}
+        </button>
+      }
+    </div>
+  }
+</div>
