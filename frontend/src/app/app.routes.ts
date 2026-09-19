@@ -35,6 +35,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/followed-lists/followed-lists.component').then(m => m.FollowedListsComponent)
   },
   {
+    path: 'lists/new',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/list-form/list-form.component').then(m => m.ListFormComponent)
+  },
+  {
+    path: 'lists/:id/edit',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/list-form/list-form.component').then(m => m.ListFormComponent)
+  },
+  {
     path: 'lists/:id',
     loadComponent: () => import('./features/list-detail/list-detail.component').then(m => m.ListDetailComponent)
   },

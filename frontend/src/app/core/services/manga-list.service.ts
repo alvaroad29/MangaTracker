@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CreateMangaListRequest, MangaListDto, UpdateMangaListRequest, MangaListItemDto, MangaListDetailDto } from '../models/lists.models';
+import { ReadingStatus } from '../models/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +37,10 @@ export class MangaListService {
   // getItems(listId: string): Observable<MangaListItemDto[]> {
   //   return this.http.get<MangaListItemDto[]>(`/api/lists/${listId}/items`);
   // }
+
+  addMangaByMalId(listId: string, malId: number, defaultStatus: ReadingStatus): Observable<MangaListItemDto> {
+    return this.http.post<MangaListItemDto>(`/api/lists/${listId}/items/by-manga`, { malId, defaultStatus });
+  }
 
   addItem(listId: string, entryId: string): Observable<void> {
     return this.http.post<void>(`/api/lists/${listId}/items/${entryId}`, {});

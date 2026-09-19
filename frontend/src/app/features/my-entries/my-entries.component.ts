@@ -55,7 +55,7 @@ export class MyEntriesComponent  { // entries de un user logueado
     this.listService.getAll()
     .pipe(
       tap(resp =>{
-        console.log({resp})
+        // console.log({resp})
       }
       )
 

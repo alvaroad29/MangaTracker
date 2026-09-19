@@ -1,58 +1,119 @@
 @if (loading()) {
-  <p class="text-(--color-text-muted)">Cargando...</p>
+  <div class="flex flex-col gap-6">
+    <div class="h-32 animate-pulse rounded-lg bg-(--color-surface-alt)"></div>
+    <div class="flex flex-col gap-3">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="h-24 animate-pulse rounded-lg bg-(--color-surface-alt)"></div>
+      }
+    </div>
+  </div>
 } @else if (detail(); as detail) {
   <div class="flex flex-col gap-6">
     <a routerLink="/lists" class="w-fit text-sm text-(--color-text-muted) hover:text-(--color-accent)">← Mis listas</a>
 
-    <div class="flex flex-col gap-2">
-      <h1 class="font-display text-2xl text-(--color-accent)">{{ detail.name }}</h1>
+    <!-- Tarjeta de cabecera con toda la info de la lista -->
+    <div class="flex flex-col gap-4 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-5 sm:p-6">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="font-display text-2xl text-(--color-accent)">{{ detail.name }}</h1>
+            <span
+              class="rounded-full px-2.5 py-0.5 text-xs font-medium"
+              [class]="detail.isPublic
+                ? 'bg-(--color-accent-2)/15 text-(--color-accent-2)'
+                : 'bg-(--color-surface-alt) text-(--color-text-muted)'"
+            >
+              {{ detail.isPublic ? '🌐 Pública' : '🔒 Privada' }}
+            </span>
+          </div>
 
-      <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-(--color-text-muted)">
-        <a [routerLink]="['/users', detail.ownerId]" class="hover:text-(--color-accent)">
-          {{ detail.ownerDisplayName }}
-        </a>
-        <span>·</span>
-        <span>{{ detail.items.length }} mangas</span>
-        <span>·</span>
-        <span>{{ detail.followerCount }} seguidores</span>
+          @if (detail.description) {
+            <p class="max-w-xl text-sm text-(--color-text-muted)">{{ detail.description }}</p>
+          }
+        </div>
+
+        <!-- Acciones: seguir (visitante) o editar (dueño) -->
+        <div class="flex shrink-0 gap-2">
+          @if (isOwnedByMe()) {
+            <button
+              (click)="showAddSearch.set(!showAddSearch())"
+              class="rounded-md border border-(--color-surface-alt) px-4 py-1.5 text-sm font-medium text-(--color-text-muted) transition-colors hover:border-(--color-accent) hover:text-(--color-accent)"
+            >
+              {{ showAddSearch() ? 'Cerrar búsqueda' : '+ Agregar' }}
+            </button>
+            <a
+              [routerLink]="['/lists', detail.id, 'edit']"
+              class="rounded-md border border-(--color-surface-alt) px-4 py-1.5 text-sm font-medium text-(--color-text-muted) transition-colors hover:border-(--color-accent) hover:text-(--color-accent)"
+            >
+              Editar
+            </a>
+          } @else {
+            <button
+              (click)="toggleFollow()"
+              class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+              [class]="detail.isFollowedByMe
+                ? 'border border-(--color-surface-alt) text-(--color-text-muted)'
+                : 'bg-(--color-accent) text-[#14151a] hover:bg-(--color-accent-hover)'"
+            >
+              {{ detail.isFollowedByMe ? 'Siguiendo ✓' : 'Seguir' }}
+            </button>
+          }
+        </div>
       </div>
 
-      @if (detail.description) {
-        <p class="text-sm text-(--color-text-muted)">{{ detail.description }}</p>
-      }
+      <!-- Dueño + metadatos -->
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-(--color-surface-alt) pt-4 text-sm text-(--color-text-muted)">
+        <a [routerLink]="['/users', detail.ownerId]" class="flex items-center gap-2 hover:text-(--color-accent)">
+          @if (detail.ownerAvatarUrl) {
+            <img [src]="detail.ownerAvatarUrl" [alt]="detail.ownerDisplayName" class="h-6 w-6 rounded-full object-cover" />
+          } @else {
+            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-(--color-surface-alt) text-xs font-medium text-(--color-accent)">
+              {{ detail.ownerDisplayName.charAt(0).toUpperCase() }}
+            </span>
+          }
+          <span>{{ detail.ownerDisplayName }}</span>
+        </a>
 
-      @if (!isOwnedByMe()) {
-        <button
-          (click)="toggleFollow()"
-          class="mt-2 w-fit rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-          [class]="detail.isFollowedByMe
-            ? 'border border-(--color-surface-alt) text-(--color-text-muted)'
-            : 'bg-(--color-accent) text-[#14151a]'"
-        >
-          {{ detail.isFollowedByMe ? 'Siguiendo ✓' : 'Seguir' }}
-        </button>
-      }
+        <span class="flex items-center gap-1">
+          <span class="font-medium text-(--color-text)">{{ detail.items.length }}</span> mangas
+        </span>
+
+        <span class="flex items-center gap-1">
+          <span class="font-medium text-(--color-text)">{{ detail.followerCount }}</span> seguidores
+        </span>
+
+        <span>Creada el {{ detail.createdAt | date: 'd MMM y' }}</span>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-3">
+    @if (isOwnedByMe() && showAddSearch()) {
+      <app-add-manga-to-list-search
+        [listId]="detail.id"
+        [existingMalIds]="existingMalIds()"
+        (added)="onMangaAdded()"
+      />
+    }
+
+    <!-- Contenido: los mangas de la lista -->
+    <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
       @for (item of detail.items; track item.id) {
         <div class="flex items-center gap-4 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-3">
-          <a [routerLink]="['/manga', item.entry.manga.malId]">
+          <a [routerLink]="['/manga', item.entry.manga.malId]" class="shrink-0">
             <img [src]="item.entry.manga.coverImageUrl" [alt]="item.entry.manga.title" class="h-20 w-14 rounded object-cover" />
           </a>
 
-          <div class="flex-1">
-            <p class="text-sm font-medium">{{ item.entry.manga.title }}</p>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium">{{ item.entry.manga.title }}</p>
             <p class="text-xs text-(--color-text-muted)">
               {{ statusLabels[item.entry.status] }} · Cap. {{ item.entry.lastChapterRead }}
             </p>
             @if (item.entry.notes) {
-              <p class="mt-1 text-xs text-(--color-text-muted)">{{ item.entry.notes }}</p>
+              <p class="mt-1 truncate text-xs text-(--color-text-muted)">{{ item.entry.notes }}</p>
             }
           </div>
 
           @if (isOwnedByMe()) {
-            <button (click)="removeItem(item.entry.id)" class="text-xs text-(--color-danger) hover:underline">
+            <button (click)="removeItem(item.entry.id)" class="shrink-0 text-xs text-(--color-danger) hover:underline">
               Quitar
             </button>
           }

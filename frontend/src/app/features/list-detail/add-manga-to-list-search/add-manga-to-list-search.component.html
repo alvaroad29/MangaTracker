@@ -1,0 +1,38 @@
+<div class="rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-4">
+  <input
+    type="text"
+    placeholder="Buscar manga para agregar..."
+    [value]="query()"
+    (input)="onInput($any($event.target).value)"
+    class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-sm text-(--color-text) outline-none focus:border-(--color-accent)"
+  />
+
+  @if (loading()) {
+    <p class="mt-3 text-sm text-(--color-text-muted)">Buscando...</p>
+  } @else if (searched() && results().length === 0) {
+    <p class="mt-3 text-sm text-(--color-text-muted)">No encontramos resultados.</p>
+  }
+
+  @if (results().length > 0) {
+    <div class="mt-3 flex flex-col gap-1">
+      @for (manga of results(); track manga.malId) {
+        <div class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-(--color-surface-alt)">
+          <img [src]="manga.coverImageUrl" [alt]="manga.title" class="h-12 w-9 shrink-0 rounded object-cover" />
+          <span class="min-w-0 flex-1 truncate text-sm">{{ manga.title }}</span>
+
+          @if (existingMalIds().has(manga.malId)) {
+            <span class="shrink-0 text-xs text-(--color-text-muted)">En la lista ✓</span>
+          } @else {
+            <button
+              (click)="addManga(manga.malId)"
+              [disabled]="addingMalId() !== null"
+              class="shrink-0 rounded-md bg-(--color-accent) px-3 py-1 text-xs font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
+            >
+              {{ addingMalId() === manga.malId ? 'Agregando...' : 'Agregar' }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

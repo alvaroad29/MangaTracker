@@ -1,0 +1,60 @@
+<div class="mx-auto max-w-lg">
+  <a routerLink="/lists" class="text-sm text-(--color-text-muted) hover:text-(--color-accent)">← Mis listas</a>
+
+  @if (loadingInitial()) {
+    <p class="mt-4 text-(--color-text-muted)">Cargando...</p>
+  } @else {
+    <h1 class="mt-4 font-display text-2xl text-(--color-accent)">
+      {{ isEditMode ? 'EDITAR LISTA' : 'NUEVA LISTA' }}
+    </h1>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-4">
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="name">Nombre</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(form, 'name')"
+        />
+        @if (formUtils.hasVisibleError(form, 'name')) {
+          <p class="mt-1 text-xs text-(--color-danger)">{{ formUtils.getFieldError(form, 'name') }}</p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm text-(--color-text-muted)" for="description">Descripción (opcional)</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="w-full rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-3 py-2 text-(--color-text) outline-none focus:border-(--color-accent)"
+          [class.input-error]="formUtils.hasVisibleError(form, 'description')"
+        ></textarea>
+        @if (formUtils.hasVisibleError(form, 'description')) {
+          <p class="mt-1 text-xs text-(--color-danger)">{{ formUtils.getFieldError(form, 'description') }}</p>
+        }
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-(--color-text-muted)">
+        <input type="checkbox" formControlName="isPublic" />
+        Hacer pública (otros usuarios podrán verla y seguirla)
+      </label>
+
+      @if (errorMessage()) {
+        <p class="rounded-md bg-(--color-danger)/10 px-3 py-2 text-sm text-(--color-danger)">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="saving()"
+        class="mt-2 w-fit rounded-md bg-(--color-accent) px-5 py-2 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover) disabled:opacity-50"
+      >
+        {{ saving() ? 'Guardando...' : (isEditMode ? 'Guardar cambios' : 'Crear lista') }}
+      </button>
+    </form>
+  }
+</div>

@@ -1,4 +1,5 @@
 import { MangaEntryDto } from "./entries.models";
+import { ReadingStatus } from "./enums";
 
 export interface MangaListDto {
   id: string;
@@ -55,6 +56,11 @@ export interface PublicUserProfileDto {
   id: string;
   displayName: string;
   avatarUrl: string | null;
+}
+
+export interface AddMangaToListRequest {
+  malId: number;
+  defaultStatus: ReadingStatus;
 }
 
 export type UpdateMangaListRequest = CreateMangaListRequest;

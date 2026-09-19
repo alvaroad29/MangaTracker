@@ -7,10 +7,12 @@ import { MangaListService } from '../../core/services/manga-list.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { statusLabels } from '../../core/models/status-labels';
 import { MangaListSocialService } from '../../core/services/manga-list-social.service';
+import { DatePipe } from '@angular/common';
+import { AddMangaToListSearchComponent } from './add-manga-to-list-search/add-manga-to-list-search.component';
 
 @Component({
   selector: 'app-list-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, AddMangaToListSearchComponent],
   templateUrl: './list-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -85,5 +87,13 @@ export class ListDetailComponent {
       },
       error: (err: HttpErrorResponse) => this.notifications.show(err.error?.title ?? 'No pudimos actualizar el seguimiento.')
     });
+  }
+
+  showAddSearch = signal(false);
+
+  existingMalIds = computed(() => new Set(this.detail()?.items.map(i => i.entry.manga.malId) ?? []));
+
+  onMangaAdded(): void {
+    this.load(); // recargamos la lista completa para traer el item nuevo con todos sus datos
   }
 }

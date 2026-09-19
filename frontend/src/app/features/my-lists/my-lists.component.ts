@@ -5,10 +5,11 @@ import { MangaListService } from '../../core/services/manga-list.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-my-lists',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, ConfirmModalComponent],
   templateUrl: './my-lists.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -19,11 +20,8 @@ export class MyListsComponent { // listas de un usuario
   lists = signal<MangaListDto[]>([]);
   loading = signal(true);
 
-  showCreateForm = signal(false);
-  newName = signal('');
-  newDescription = signal('');
-  newIsPublic = signal(false);
-  creating = signal(false);
+  pendingDelete = signal<MangaListDto | null>(null);
+  deleting = signal(false);
 
   constructor() {
     this.load();
@@ -40,45 +38,22 @@ export class MyListsComponent { // listas de un usuario
     });
   }
 
-  create(): void {
-    if (!this.newName().trim()) return;
+  confirmDelete(): void {
+    const list = this.pendingDelete();
+    if (!list) return;
 
-    this.creating.set(true);
-    this.listService.create({
-      name: this.newName(),
-      description: this.newDescription() || null,
-      isPublic: this.newIsPublic()
-    }).subscribe({
-      next: list => {
-        this.creating.set(false);
-        this.lists.update(l => [list, ...l]);
-        this.showCreateForm.set(false);
-        this.newName.set('');
-        this.newDescription.set('');
-        this.newIsPublic.set(false);
+    this.deleting.set(true);
+    this.listService.delete(list.id).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.pendingDelete.set(null);
+        this.lists.update(current => current.filter(l => l.id !== list.id));
+        this.notifications.show('Lista borrada.', 'success');
       },
       error: (err: HttpErrorResponse) => {
-        this.creating.set(false);
-        this.notifications.show(err.error?.title ?? 'No pudimos crear la lista.');
+        this.deleting.set(false);
+        this.notifications.show(err.error?.title ?? 'No pudimos borrar la lista.');
       }
-    });
-  }
-
-  togglePublic(list: MangaListDto): void {
-    this.listService.update(list.id, {
-      name: list.name,
-      description: list.description,
-      isPublic: !list.isPublic
-    }).subscribe({
-      next: updated => this.lists.update(l => l.map(x => (x.id === updated.id ? updated : x))),
-      error: (err: HttpErrorResponse) => this.notifications.show(err.error?.title ?? 'No pudimos actualizar la lista.')
-    });
-  }
-
-  remove(listId: string): void {
-    this.listService.delete(listId).subscribe({
-      next: () => this.lists.update(l => l.filter(x => x.id !== listId)),
-      error: (err: HttpErrorResponse) => this.notifications.show(err.error?.title ?? 'No pudimos borrar la lista.')
     });
   }
 }

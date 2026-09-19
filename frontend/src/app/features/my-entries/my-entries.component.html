@@ -36,9 +36,9 @@
             </div>
             <div class="flex gap-2 text-xs">
               @if (editingId() !== entry.id) {
-                <button (click)="startEdit(entry)" class="text-(--color-accent) hover:underline">Editar</button>
+                <button (click)="startEdit(entry)" class="text-(--color-accent) hover:underline cursor-pointer">Editar</button>
               }
-              <button (click)="remove(entry.id)" class="text-(--color-danger) hover:underline">Quitar</button>
+              <button (click)="remove(entry.id)" class="text-(--color-danger) hover:underline cursor-pointer">Quitar</button>
             </div>
           </div>
 
@@ -56,7 +56,7 @@
                 <select
                   [ngModel]="editStatus()"
                   (ngModelChange)="editStatus.set(+$event)"
-                  class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm"
+                  class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm cursor-pointer"
                 >
                   @for (opt of statusOptions; track opt) {
                     <option [value]="opt">{{ statusLabels[opt] }}</option>
@@ -68,7 +68,7 @@
                   min="0"
                   [ngModel]="editChapter()"
                   (ngModelChange)="editChapter.set($event)"
-                  class="w-24 rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm"
+                  class="w-24 rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm cursor-pointer"
                 />
               </div>
 
@@ -84,11 +84,11 @@
                 <button
                   (click)="saveEdit(entry.id)"
                   [disabled]="saving()"
-                  class="rounded-md bg-(--color-accent) px-3 py-1 text-sm font-medium text-[#14151a] disabled:opacity-50"
+                  class="rounded-md bg-(--color-accent) px-3 py-1 text-sm font-medium text-[#14151a] disabled:opacity-50 cursor-pointer"
                 >
                   {{ saving() ? 'Guardando...' : 'Guardar' }}
                 </button>
-                <button (click)="cancelEdit()" class="rounded-md border border-(--color-surface-alt) px-3 py-1 text-sm">
+                <button (click)="cancelEdit()" class="rounded-md border border-(--color-surface-alt) px-3 py-1 text-sm cursor-pointer">
                   Cancelar
                 </button>
               </div>

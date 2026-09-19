@@ -1,7 +1,7 @@
  <div class="relative">
       <button
         (click)="open.set(!open())"
-        class="flex items-center gap-1 text-xs text-(--color-accent-2) hover:underline"
+        class="flex items-center gap-1 text-xs text-(--color-accent-2) hover:underline cursor-pointer"
       >
         + Agregar a lista
       </button>
@@ -11,7 +11,7 @@
           @for (list of lists(); track list.id) {
             <button
               (click)="pick(list.id)"
-              class="block w-full px-3 py-1.5 text-left text-sm hover:bg-(--color-surface-alt)"
+              class="block w-full px-3 py-1.5 text-left text-sm hover:bg-(--color-surface-alt) cursor-pointer"
             >
               {{ list.name }}
             </button>
