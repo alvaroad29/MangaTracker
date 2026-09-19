@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserMenuComponent } from "../user-menu/user-menu.component";
@@ -11,4 +11,6 @@ import { UserMenuComponent } from "../user-menu/user-menu.component";
 })
 export class NavbarComponent {
   auth = inject(AuthService);
+  
+  mobileMenuOpen = signal(false);
 }

@@ -4,33 +4,44 @@
       MANGATRACKER
     </a>
 
-    <div class="flex items-center gap-6 text-sm">
-      <a
-        routerLink="/search"
-        routerLinkActive="text-(--color-accent)"
-        class="text-(--color-text-muted) transition-colors hover:text-(--color-text)"
-      >
+    <!-- links de escritorio -->
+    <div class="hidden items-center gap-6 text-sm sm:flex">
+      <a routerLink="/search" routerLinkActive="text-(--color-accent)" class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
         Buscar manga
       </a>
-
-      <a
-        routerLink="/explore"
-        routerLinkActive="text-(--color-accent)"
-        class="text-(--color-text-muted) transition-colors hover:text-(--color-text)"
-      >
+      <a routerLink="/explore" routerLinkActive="text-(--color-accent)" class="text-(--color-text-muted) transition-colors hover:text-(--color-text)">
         Explorar listas
       </a>
 
       @if (auth.isAuthenticated()) {
         <app-user-menu />
       } @else {
-        <a
-          routerLink="/login"
-          class="rounded-md bg-(--color-accent) px-4 py-1.5 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover)"
-        >
+        <a routerLink="/login" class="rounded-md bg-(--color-accent) px-4 py-1.5 font-medium text-[#14151a] transition-colors hover:bg-(--color-accent-hover)">
           Ingresar
         </a>
       }
     </div>
+
+    <!-- botón hamburguesa, solo mobile -->
+    <button (click)="mobileMenuOpen.set(!mobileMenuOpen())" class="text-(--color-text) cursor-pointer sm:hidden" aria-label="Abrir menú">
+      @if (mobileMenuOpen()) { ✕ } @else { ☰ }
+    </button>
   </div>
+
+  <!-- menú desplegado, solo mobile -->
+  @if (mobileMenuOpen()) {
+    <div class="flex flex-col gap-1 border-t border-(--color-surface-alt) px-6 py-4 sm:hidden">
+      <a routerLink="/search" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-text-muted)">Buscar manga</a>
+      <a routerLink="/explore" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-text-muted)">Explorar listas</a>
+
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/my-list" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-text-muted)">Mi progreso</a>
+        <a routerLink="/lists" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-text-muted)">Mis listas</a>
+        <a routerLink="/lists/followed" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-text-muted)">Listas seguidas</a>
+        <button (click)="auth.logout(); mobileMenuOpen.set(false)" class="py-2 text-left text-sm text-(--color-danger)">Salir</button>
+      } @else {
+        <a routerLink="/login" (click)="mobileMenuOpen.set(false)" class="py-2 text-sm text-(--color-accent)">Ingresar</a>
+      }
+    </div>
+  }
 </nav>

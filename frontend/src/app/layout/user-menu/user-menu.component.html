@@ -1,7 +1,7 @@
 <div class="relative">
     <button
       (click)="open.set(!open())"
-      class="flex items-center gap-2 rounded-md px-2 py-1.5 text-(--color-text-muted) transition-colors hover:text-(--color-text)"
+      class="flex items-center gap-2 rounded-md px-2 py-1.5 text-(--color-text-muted) transition-colors hover:text-(--color-text) cursor-pointer"
     >
       <span class="flex h-6 w-6 items-center justify-center rounded-full bg-(--color-surface-alt) text-xs font-medium text-(--color-accent)">
         {{ (auth.user()?.displayName ?? '?').charAt(0).toUpperCase() }}
@@ -24,7 +24,7 @@
         <div class="my-1 border-t border-(--color-surface-alt)"></div>
         <button
           (click)="logout()"
-          class="block w-full px-3 py-2 text-left text-sm text-(--color-danger) hover:bg-(--color-surface-alt)"
+          class="block w-full px-3 py-2 text-left text-sm text-(--color-danger) hover:bg-(--color-surface-alt) cursor-pointer"
         >
           Salir
         </button>
