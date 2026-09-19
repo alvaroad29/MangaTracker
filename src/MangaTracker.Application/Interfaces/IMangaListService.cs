@@ -1,4 +1,5 @@
 ﻿using MangaTracker.Application.DTOs.Lists;
+using MangaTracker.Domain.Enums;
 
 namespace MangaTracker.Application.Interfaces;
 
@@ -14,6 +15,8 @@ public interface IMangaListService
 
     // Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid userId, Guid listId); // treaer items lista
     // Task<IReadOnlyList<MangaListItemDto>> GetItemsAsync(Guid? viewerUserId, Guid listId);
-    Task AddItemAsync(Guid userId, Guid listId, Guid entryId); // agregar item lista
+    Task AddItemAsync(Guid userId, Guid listId, Guid entryId); // agregar item lista (entry existente)
     Task RemoveItemAsync(Guid userId, Guid listId, Guid entryId);
+    
+    Task<MangaListItemDto> AddMangaByMalIdAsync(Guid userId, Guid listId, int malId, ReadingStatus defaultStatus);
 }

@@ -53,6 +53,10 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
     //     var viewerId = User.Identity?.IsAuthenticated == true ? User.GetUserId() : (Guid?)null;
     //     return Ok(await listService.GetItemsAsync(viewerId, listId));
     // }
+    
+    [HttpPost("{listId:guid}/items/by-manga")]
+    public async Task<IActionResult> AddMangaByMalId(Guid listId, AddMangaToListRequest request)
+        => Ok(await listService.AddMangaByMalIdAsync(User.GetUserId(), listId, request.MalId, request.DefaultStatus));
 
     [HttpPost("{listId:guid}/items/{entryId:guid}")]
     public async Task<IActionResult> AddItem(Guid listId, Guid entryId)

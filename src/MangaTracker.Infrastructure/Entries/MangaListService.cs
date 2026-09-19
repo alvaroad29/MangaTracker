@@ -4,12 +4,13 @@ using MangaTracker.Application.DTOs.Lists;
 using MangaTracker.Application.Exceptions;
 using MangaTracker.Application.Interfaces;
 using MangaTracker.Domain.Entities;
+using MangaTracker.Domain.Enums;
 using MangaTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace MangaTracker.Infrastructure.Entries;
 
-public class MangaListService(ApplicationDbContext db) : IMangaListService
+public class MangaListService(ApplicationDbContext db, IMangaSnapshotService snapshotService) : IMangaListService
 {
     public async Task<MangaListDto> CreateAsync(Guid userId, CreateMangaListRequest request)
     {
@@ -202,5 +203,54 @@ public class MangaListService(ApplicationDbContext db) : IMangaListService
             e.Id, snapshotDto, e.Status, e.LastChapterRead, e.Score, e.Notes, e.StartedAt, e.FinishedAt, e.CreatedAt, e.UpdatedAt);
 
         return new MangaListItemDto(i.Id, entryDto, i.AddedAt);
+    }
+    
+    public async Task<MangaListItemDto> AddMangaByMalIdAsync(Guid userId, Guid listId, int malId, ReadingStatus defaultStatus)
+    {
+        await FindOwnedListAsync(userId, listId); // valida que la lista sea tuya, como en AddItemAsync
+
+        var snapshot = await snapshotService.GetOrCreateAsync(malId);
+
+        var entry = await db.UserMangaEntries
+            .Include(e => e.MangaSnapshot)
+            .ThenInclude(s => s.MangaSnapshotGenres)
+            .ThenInclude(sg => sg.Genre)
+            .FirstOrDefaultAsync(e => e.UserId == userId && e.MangaSnapshotId == snapshot.Id);
+
+        if (entry is null)
+        {
+            entry = new UserMangaEntry
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                MangaSnapshotId = snapshot.Id,
+                Status = defaultStatus,
+                LastChapterRead = 0,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            db.UserMangaEntries.Add(entry);
+            await db.SaveChangesAsync();
+        }
+
+        var alreadyInList = await db.MangaListItems
+            .AnyAsync(i => i.MangaListId == listId && i.UserMangaEntryId == entry.Id);
+
+        if (alreadyInList)
+            throw new ConflictAppException("Ese manga ya está en esta lista.");
+
+        var item = new MangaListItem
+        {
+            Id = Guid.NewGuid(),
+            MangaListId = listId,
+            UserMangaEntryId = entry.Id,
+            AddedAt = DateTime.UtcNow
+        };
+
+        db.MangaListItems.Add(item);
+        await db.SaveChangesAsync();
+
+        item.UserMangaEntry = entry; // para que ToItemDto tenga la navegación cargada sin ir de nuevo a la base
+        return ToItemDto(item);
     }
 }
