@@ -1,0 +1,59 @@
+<div class="flex flex-col gap-3 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-4 sm:flex-row">
+  <a [routerLink]="['/manga', item().entry.manga.malId]" class="shrink-0">
+    <img
+      [src]="item().entry.manga.coverImageUrl"
+      [alt]="item().entry.manga.title"
+      class="h-32 w-24 rounded object-cover sm:h-40 sm:w-28"
+    />
+  </a>
+
+  <div class="flex min-w-0 flex-1 flex-col gap-2">
+    <div>
+      <a [routerLink]="['/manga', item().entry.manga.malId]" class="font-medium hover:text-(--color-accent)">
+        {{ item().entry.manga.title }}
+      </a>
+      <div class="mt-1 flex flex-wrap gap-1.5">
+        <span class="rounded-full bg-(--color-surface-alt) px-2 py-0.5 text-xs text-(--color-text-muted)">
+          {{ typeLabels[item().entry.manga.type] }}
+        </span>
+        @for (genre of item().entry.manga.genres; track genre.malId) {
+          <span class="rounded-full bg-(--color-surface-alt) px-2 py-0.5 text-xs text-(--color-text-muted)">
+            {{ genre.name }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-(--color-text-muted)">
+      <span>{{ statusLabels[item().entry.status] }}</span>
+      <span>Cap. {{ item().entry.lastChapterRead }}</span>
+      @if (item().entry.score !== null) {
+        <span>★ {{ item().entry.score }}/10</span>
+      }
+    </div>
+
+    @if (item().entry.startedAt || item().entry.finishedAt) {
+      <div class="flex flex-wrap gap-x-4 text-xs text-(--color-text-muted)">
+        @if (item().entry.startedAt) {
+          <span>Empezado: {{ item().entry.startedAt | date: 'd MMM y' }}</span>
+        }
+        @if (item().entry.finishedAt) {
+          <span>Terminado: {{ item().entry.finishedAt | date: 'd MMM y' }}</span>
+        }
+      </div>
+    }
+
+    @if (item().entry.notes) {
+      <p class="text-xs text-(--color-text-muted)">{{ item().entry.notes }}</p>
+    }
+
+    <span class="text-xs text-(--color-text-muted)">Agregado el {{ item().addedAt | date: 'd MMM y' }}</span>
+
+    @if (canManage()) {
+      <div class="mt-auto flex gap-3 pt-1 text-xs">
+        <button (click)="edit.emit()" class="text-(--color-accent-2) hover:underline">Editar</button>
+        <button (click)="remove.emit()" class="text-(--color-danger) hover:underline">Quitar</button>
+      </div>
+    }
+  </div>
+</div>

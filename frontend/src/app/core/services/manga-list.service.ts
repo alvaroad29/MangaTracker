@@ -22,8 +22,16 @@ export class MangaListService {
   //   return this.http.get<MangaListDto>(`/api/lists/${listId}`);
   // }
 
-  getDetail(listId: string): Observable<MangaListDetailDto> {
-    return this.http.get<MangaListDetailDto>(`/api/lists/${listId}`);
+  // getDetail(listId: string): Observable<MangaListDetailDto> {
+  //   return this.http.get<MangaListDetailDto>(`/api/lists/${listId}`);
+  // }
+
+  getDetail(listId: string, page = 1): Observable<MangaListDetailDto> {
+    return this.http.get<MangaListDetailDto>(`/api/lists/${listId}`, { params: { page } });
+  }
+
+  getListedMalIds(listId: string): Observable<number[]> {
+    return this.http.get<number[]>(`/api/lists/${listId}/items/mal-ids`);
   }
 
   update(listId: string, request: UpdateMangaListRequest): Observable<MangaListDto> {

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PublicMangaListDto, PublicUserProfileDto } from '../models/lists.models';
+import { PublicListSearchResponse, PublicMangaListDto, PublicUserProfileDto } from '../models/lists.models';
 
 @Injectable({
   providedIn: 'root',
@@ -9,12 +9,10 @@ import { PublicMangaListDto, PublicUserProfileDto } from '../models/lists.models
 export class MangaListSocialService {
    private http = inject(HttpClient);
 
-  searchPublic(search: string | null, page = 1): Observable<PublicMangaListDto[]> {
-    // console.log(search);
-
+  searchPublic(search: string | null, page = 1): Observable<PublicListSearchResponse> {
     const params: Record<string, string | number> = { page };
     if (search) params['search'] = search;
-    return this.http.get<PublicMangaListDto[]>('/api/lists/public', { params });
+    return this.http.get<PublicListSearchResponse>('/api/lists/public', { params });
   }
 
   getUserLists(userId: string): Observable<PublicMangaListDto[]> {

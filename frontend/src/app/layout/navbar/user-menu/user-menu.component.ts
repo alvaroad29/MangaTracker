@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal } from '@angular/core';
-import { AuthService } from '../../core/auth/services/auth.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
 import { RouterLink } from '@angular/router';
 
 @Component({

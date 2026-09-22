@@ -11,23 +11,30 @@ export interface MangaListDto {
   createdAt: string;
 }
 
-export interface MangaListItemDto {
-  id: string;
-  entry: MangaEntryDto;
-  addedAt: string;
-}
-
 export interface PublicMangaListDto {
   id: string;
   name: string;
   description: string | null;
-  itemCount: number;
+  mangaCount: number;
   followerCount: number;
   ownerId: string;
   ownerDisplayName: string;
   ownerAvatarUrl: string | null;
   isFollowedByMe: boolean;
   createdAt: string;
+}
+
+export interface PublicListSearchResponse {
+  items: PublicMangaListDto[];
+  currentPage: number;
+  hasNextPage: boolean;
+  lastVisiblePage: number;
+  totalItemsCount: number;
+}
+export interface MangaListItemDto {
+  id: string;
+  entry: MangaEntryDto;
+  addedAt: string;
 }
 
 
@@ -50,6 +57,10 @@ export interface MangaListDetailDto {
   isFollowedByMe: boolean;
   createdAt: string;
   items: MangaListItemDto[];
+  itemsCurrentPage: number;
+  itemsHasNextPage: boolean;
+  itemsLastVisiblePage: number;
+  itemsTotalCount: number;
 }
 
 export interface PublicUserProfileDto {

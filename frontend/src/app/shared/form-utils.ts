@@ -72,6 +72,11 @@ export class FormUtils {
         case 'maxlength':
           return `Maximo de ${ errors['maxlength'].requiredLength } caracteres`;
 
+        case 'min':
+          return `El valor mínimo es ${errors['min'].min}`;
+        case 'max':
+          return `El valor máximo es ${errors['max'].max}`;
+
         case 'pattern':
           if( errors['pattern'].requiredPattern == FormUtils.emailPattern ){
             return 'El valor ingresado no luce como un correo electrónico';

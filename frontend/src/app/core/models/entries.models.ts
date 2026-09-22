@@ -19,4 +19,6 @@ export interface UpdateMangaEntryRequest {
   lastChapterRead: number;
   score: number | null;
   notes: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
 }

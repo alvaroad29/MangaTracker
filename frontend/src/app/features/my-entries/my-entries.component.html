@@ -32,70 +32,32 @@
               <p class="font-medium">{{ entry.manga.title }}</p>
               <p class="text-xs text-(--color-text-muted)">
                 {{ statusLabels[entry.status] }} · Cap. {{ entry.lastChapterRead }}
+                @if (entry.score !== null) {
+                  · ★ {{ entry.score }}/10
+                }
               </p>
             </div>
             <div class="flex gap-2 text-xs">
-              @if (editingId() !== entry.id) {
-                <button (click)="startEdit(entry)" class="text-(--color-accent) hover:underline cursor-pointer">Editar</button>
-              }
-              <button (click)="remove(entry.id)" class="text-(--color-danger) hover:underline cursor-pointer">Quitar</button>
+              <button (click)="openEdit(entry)" class="cursor-pointer text-(--color-accent) hover:underline">Editar</button>
+              <button (click)="remove(entry.id)" class="cursor-pointer text-(--color-danger) hover:underline">Quitar</button>
             </div>
           </div>
 
+          <app-add-to-list-menu [lists]="myLists()" (listPicked)="addToList(entry.id, $event)" />
 
-        <app-add-to-list-menu [lists]="myLists()" (listPicked)="addToList(entry.id, $event)" />
-
-
-          @if (entry.notes && editingId() !== entry.id) {
+          @if (entry.notes) {
             <p class="text-xs text-(--color-text-muted)">{{ entry.notes }}</p>
-          }
-
-          @if (editingId() === entry.id) {
-            <div class="mt-2 flex flex-col gap-2 border-t border-(--color-surface-alt) pt-3">
-              <div class="flex gap-3">
-                <select
-                  [ngModel]="editStatus()"
-                  (ngModelChange)="editStatus.set(+$event)"
-                  class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm cursor-pointer"
-                >
-                  @for (opt of statusOptions; track opt) {
-                    <option [value]="opt">{{ statusLabels[opt] }}</option>
-                  }
-                </select>
-
-                <input
-                  type="number"
-                  min="0"
-                  [ngModel]="editChapter()"
-                  (ngModelChange)="editChapter.set($event)"
-                  class="w-24 rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm cursor-pointer"
-                />
-              </div>
-
-              <textarea
-                [ngModel]="editNotes()"
-                (ngModelChange)="editNotes.set($event)"
-                placeholder="Notas..."
-                rows="2"
-                class="rounded-md border border-(--color-surface-alt) bg-(--color-bg) px-2 py-1 text-sm"
-              ></textarea>
-
-              <div class="flex gap-2">
-                <button
-                  (click)="saveEdit(entry.id)"
-                  [disabled]="saving()"
-                  class="rounded-md bg-(--color-accent) px-3 py-1 text-sm font-medium text-[#14151a] disabled:opacity-50 cursor-pointer"
-                >
-                  {{ saving() ? 'Guardando...' : 'Guardar' }}
-                </button>
-                <button (click)="cancelEdit()" class="rounded-md border border-(--color-surface-alt) px-3 py-1 text-sm cursor-pointer">
-                  Cancelar
-                </button>
-              </div>
-            </div>
           }
         </div>
       </div>
     }
   </div>
 </div>
+
+<app-edit-entry-modal
+  [open]="editingEntry() !== null"
+  [entry]="editingEntry()"
+  [saving]="saving()"
+  (save)="saveEdit($event)"
+  (cancel)="editingEntry.set(null)"
+/>

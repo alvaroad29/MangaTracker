@@ -75,13 +75,15 @@ export class MangaDetailComponent {
     if (currentEntry && currentEntry.status === status) return;
 
     this.adding.set(true);
-    
+
     if (this.trackedEntry()) {
       const request: UpdateMangaEntryRequest = {
         status,
         lastChapterRead: this.trackedEntry()!.lastChapterRead,
         score: this.trackedEntry()!.score,
-        notes: this.trackedEntry()!.notes
+        notes: this.trackedEntry()!.notes,
+        startedAt: this.trackedEntry()!.startedAt,
+        finishedAt: this.trackedEntry()!.finishedAt
       };
 
       this.entryService.update(this.trackedEntry()!.id, request).subscribe({
