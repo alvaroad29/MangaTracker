@@ -62,8 +62,10 @@ public class UserMangaEntryService(ApplicationDbContext db, IMangaSnapshotServic
         entry.LastChapterRead = request.LastChapterRead;
         entry.Score = request.Score;
         entry.Notes = request.Notes;
+        entry.StartedAt = request.StartedAt;
+        entry.FinishedAt = request.FinishedAt;
         entry.UpdatedAt = DateTime.UtcNow;
-
+        
         if (request.Status == ReadingStatus.Reading && entry.StartedAt is null)
             entry.StartedAt = DateTime.UtcNow;
 

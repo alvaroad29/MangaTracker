@@ -21,11 +21,16 @@ public class MangaListsController(IMangaListService listService) : ControllerBas
    
     [HttpGet("{listId:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetDetail(Guid listId)
+    public async Task<IActionResult> GetDetail(Guid listId, [FromQuery] int page = 1)
     {
         var viewerId = User.Identity?.IsAuthenticated == true ? User.GetUserId() : (Guid?)null;
-        return Ok(await listService.GetDetailAsync(viewerId, listId));
+        return Ok(await listService.GetDetailAsync(viewerId, listId, page));
     }
+    
+    [HttpGet("{listId:guid}/items/mal-ids")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetListedMalIds(Guid listId)
+        => Ok(await listService.GetListedMalIdsAsync(listId));
         
     // [HttpGet("{listId:guid}")]
     // [AllowAnonymous]

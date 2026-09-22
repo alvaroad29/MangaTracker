@@ -12,6 +12,8 @@ namespace MangaTracker.Infrastructure.Entries;
 
 public class MangaListService(ApplicationDbContext db, IMangaSnapshotService snapshotService) : IMangaListService
 {
+    private const int PageSize = 20;
+    
     public async Task<MangaListDto> CreateAsync(Guid userId, CreateMangaListRequest request)
     {
         var nameTaken = await db.MangaLists.AnyAsync(l => l.UserId == userId && l.Name == request.Name);
@@ -108,7 +110,7 @@ public class MangaListService(ApplicationDbContext db, IMangaSnapshotService sna
     //     return ToDto(list, itemCount);
     // }
     
-    public async Task<MangaListDetailDto> GetDetailAsync(Guid? viewerUserId, Guid listId)
+    public async Task<MangaListDetailDto> GetDetailAsync(Guid? viewerUserId, Guid listId, int page)
     {
         var found = await (
             from list in db.MangaLists
@@ -124,6 +126,9 @@ public class MangaListService(ApplicationDbContext db, IMangaSnapshotService sna
         if (!isOwner && !list1.IsPublic)
             throw new NotFoundAppException("No se encontró esa lista.");
 
+        var totalItemsCount = await db.MangaListItems.CountAsync(i => i.MangaListId == listId);
+        var lastVisiblePage = Math.Max(1, (int)Math.Ceiling(totalItemsCount / (double)PageSize));
+        
         var items = await db.MangaListItems
             .Include(i => i.UserMangaEntry)
             .ThenInclude(e => e.MangaSnapshot)
@@ -131,6 +136,8 @@ public class MangaListService(ApplicationDbContext db, IMangaSnapshotService sna
             .ThenInclude(sg => sg.Genre)
             .Where(i => i.MangaListId == listId)
             .OrderByDescending(i => i.AddedAt)
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
             .ToListAsync();
 
         var followerCount = await db.ListFollows.CountAsync(f => f.MangaListId == listId);
@@ -140,8 +147,17 @@ public class MangaListService(ApplicationDbContext db, IMangaSnapshotService sna
         return new MangaListDetailDto(
             list1.Id, list1.Name, list1.Description, list1.IsPublic,
             owner1.Id, owner1.DisplayName, owner1.AvatarUrl,
-            followerCount, isFollowedByMe,
-            list1.CreatedAt, items.Select(ToItemDto).ToList());
+            followerCount, isFollowedByMe, list1.CreatedAt,
+            items.Select(ToItemDto).ToList(),
+            page, page < lastVisiblePage, lastVisiblePage, totalItemsCount);
+    }
+    
+    public async Task<IReadOnlyList<int>> GetListedMalIdsAsync(Guid listId)
+    {
+        return await db.MangaListItems
+            .Where(i => i.MangaListId == listId)
+            .Select(i => i.UserMangaEntry.MangaSnapshot.MalId)
+            .ToListAsync();
     }
 
     public async Task AddItemAsync(Guid userId, Guid listId, Guid entryId)

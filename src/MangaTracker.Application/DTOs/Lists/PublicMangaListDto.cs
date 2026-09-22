@@ -4,7 +4,7 @@ public record PublicMangaListDto(
     Guid Id,
     string Name,
     string? Description,
-    int ItemCount,
+    int MangaCount,
     int FollowerCount,
     Guid OwnerId,
     string OwnerDisplayName,

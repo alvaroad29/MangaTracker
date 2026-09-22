@@ -13,36 +13,33 @@ public class MangaListSocialService(ApplicationDbContext db) : IMangaListSocialS
     private const int PageSize = 20;
        
 
-    public async Task<IReadOnlyList<PublicMangaListDto>> SearchPublicListsAsync(Guid? currentUserId, string? search, int page)
+    public async Task<PublicListSearchResponse> SearchPublicListsAsync(Guid? currentUserId, string? search, int page)
     {
-         var query =
+        var baseQuery =
             from list in db.MangaLists
             join owner in db.Users on list.UserId equals owner.Id
             where list.IsPublic
             select new { list, owner };
 
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(x => x.list.Name.Contains(search));
+            baseQuery = baseQuery.Where(x => x.list.Name.Contains(search));
 
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(x => x.list.Name.Contains(search));
+        var totalItemsCount = await baseQuery.CountAsync();
+        var lastVisiblePage = Math.Max(1, (int)Math.Ceiling(totalItemsCount / (double)PageSize));
 
-        var paged = await query
+        var pageItems = await baseQuery
             .OrderByDescending(x => x.list.Followers.Count)
             .Skip((page - 1) * PageSize)
             .Take(PageSize)
             .Select(x => new PublicListProjection(
-                x.list,
-                x.owner.Id,
-                x.owner.DisplayName,
-                x.owner.AvatarUrl,
-                x.list.MangaListItems.Count,
-                x.list.Followers.Count,
+                x.list, x.owner.Id, x.owner.DisplayName, x.owner.AvatarUrl,
+                x.list.MangaListItems.Count, x.list.Followers.Count,
                 currentUserId != null && x.list.Followers.Any(f => f.FollowerUserId == currentUserId)
             ))
             .ToListAsync();
 
-        return paged.Select(ToDto).ToList();
+        return new PublicListSearchResponse(
+            pageItems.Select(ToDto).ToList(), page, page < lastVisiblePage, lastVisiblePage, totalItemsCount);
     }
 
     public async Task<IReadOnlyList<PublicMangaListDto>> GetUserPublicListsAsync(Guid targetUserId, Guid? currentUserId)
@@ -132,18 +129,11 @@ public class MangaListSocialService(ApplicationDbContext db) : IMangaListSocialS
 
         return new PublicUserProfileDto(user.Id, user.DisplayName, user.AvatarUrl);
     }
-
     private static PublicMangaListDto ToDto(PublicListProjection p) => new(
-        p.List.Id, p.List.Name, p.List.Description, p.ItemCount, p.FollowerCount,
+        p.List.Id, p.List.Name, p.List.Description, p.MangaCount, p.FollowerCount,
         p.OwnerId, p.OwnerDisplayName, p.OwnerAvatarUrl, p.IsFollowedByMe, p.List.CreatedAt);
 
-
     private record PublicListProjection(
-        MangaList List, 
-        Guid OwnerId, 
-        string OwnerDisplayName, 
-        string? OwnerAvatarUrl,
-        int ItemCount, 
-        int FollowerCount, 
-        bool IsFollowedByMe);
+        MangaList List, Guid OwnerId, string OwnerDisplayName, string? OwnerAvatarUrl,
+        int MangaCount, int FollowerCount, bool IsFollowedByMe);
 }

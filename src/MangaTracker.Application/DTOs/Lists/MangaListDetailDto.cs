@@ -11,4 +11,8 @@ public record MangaListDetailDto(
     int FollowerCount,
     bool IsFollowedByMe,
     DateTime CreatedAt,
-    IReadOnlyList<MangaListItemDto> Items);
+    IReadOnlyList<MangaListItemDto> Items,
+    int ItemsCurrentPage,
+    bool ItemsHasNextPage,
+    int ItemsLastVisiblePage,
+    int ItemsTotalCount);
