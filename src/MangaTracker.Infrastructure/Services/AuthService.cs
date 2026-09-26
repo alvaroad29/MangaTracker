@@ -62,6 +62,14 @@ public class AuthService(
     }
 
     public Task LogoutAsync(string refreshToken) => refreshTokenService.RevokeAsync(refreshToken);
+    
+    public async Task<UserDto> GetCurrentUserAsync(Guid userId)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString())
+                   ?? throw new UnauthorizedAppException("El usuario ya no existe.");
+
+        return userMapper.ToDto(user);
+    }
 
     private async Task<AuthResponse> BuildAuthResponseAsync(ApplicationUser user)
     {

@@ -1,5 +1,7 @@
-﻿using MangaTracker.Application.DTOs.Auth;
+﻿using MangaTracker.Api.Extensions;
+using MangaTracker.Application.DTOs.Auth;
 using MangaTracker.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MangaTracker.Api.Controllers;
@@ -26,4 +28,9 @@ public class AuthController(IAuthService authService) : ControllerBase
         await authService.LogoutAsync(refreshToken);
         return NoContent();
     }
+    
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<UserDto>> Me()
+        => Ok(await authService.GetCurrentUserAsync(User.GetUserId()));
 }
