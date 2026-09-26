@@ -12,12 +12,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-
-
-      // Solo mostramos el toast genérico para errores INESPERADOS (red caída, 500).
-      // Los errores esperables (400 de validación, 401, 403, 404, 409) los sigue
-      // manejando cada componente puntualmente, porque ahí sí importa el mensaje específico.
-      if (error.status === 0 || error.status >= 500) {
+      if (error.status === 429) {
+        notifications.show('Estamos recibiendo muchas búsquedas ahora mismo. Esperá un momento y probá de nuevo.');
+      } else if (error.status === 0 || error.status >= 500) {
         notifications.show('Ocurrió un error de conexión. Probá de nuevo en un momento.');
       }
       return throwError(() => error);
