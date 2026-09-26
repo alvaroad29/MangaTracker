@@ -1,8 +1,11 @@
 import type { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthResponse } from '../models/auth.models';
+
+let refreshInProgress$: Observable<AuthResponse> | null = null;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -10,7 +13,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = authService.getAccessToken();
   const authReq = token
-
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 
@@ -25,7 +27,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           return throwError(() => error);
         }
 
-        return authService.refresh().pipe(
+        if (!refreshInProgress$) {
+          refreshInProgress$ = authService.refresh().pipe(
+            shareReplay(1), // el resultado se comparte con quien se "sume" después de que ya terminó
+            finalize(() => { refreshInProgress$ = null; }) // se limpia al terminar, para el próximo 401 futuro
+          );
+        }
+
+
+         return refreshInProgress$.pipe(
           switchMap(res => {
             const retryReq = req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } });
             return next(retryReq);

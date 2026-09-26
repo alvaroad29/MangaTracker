@@ -69,6 +69,10 @@ export class AuthService {
     this.clearSession();
   }
 
+  me(): Observable<UserDto> {
+    return this.http.get<UserDto>('/api/auth/me');
+  }
+
   private forceLogout(): void {
     this.clearSession();
     this.router.navigateByUrl('/login');
@@ -96,14 +100,27 @@ export class AuthService {
     this.currentUser.set(null);
   }
 
+  validateSessionOnStartup(): void {
+    if (!this.isAuthenticated()) return; // no había nada guardado, nada que validar
 
-    private readStoredUser(): UserDto | null {
-      const raw = localStorage.getItem(USER_KEY);
-      if (!raw) return null;
-      try {
-        return JSON.parse(raw) as UserDto;
-      } catch {
-        return null;
+    this.me().subscribe({
+      next: user => {
+        // el backend es la fuente de verdad — resincronizamos localStorage y el signal
+        // por si algo cambió (ej: editaste tu displayName desde otro dispositivo)
+        localStorage.setItem('mt_user', JSON.stringify(user));
+        this.currentUser.set(user);
       }
+      
+    });
+  }
+
+  private readStoredUser(): UserDto | null {
+    const raw = localStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as UserDto;
+    } catch {
+      return null;
     }
+  }
 }
