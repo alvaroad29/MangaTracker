@@ -1,0 +1,62 @@
+<div class="flex flex-col gap-6">
+  <div>
+    <h1 class="font-display text-2xl text-(--color-accent)">BUSCAR CON IA</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">
+      Describí lo que buscás con tus palabras, sin preocuparte por armar la búsqueda exacta.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-2 sm:flex-row">
+    <textarea
+      rows="2"
+      placeholder="Ej: un manga de romance escolar que ya haya terminado, con mucho drama..."
+      [value]="description()"
+      (input)="onInput($any($event.target).value)"
+      class="flex-1 resize-none rounded-md border border-(--color-surface-alt) bg-(--color-surface) px-4 py-2.5 text-sm outline-none focus:border-(--color-accent)"
+    ></textarea>
+    <button
+      (click)="submit()"
+      [disabled]="loading()"
+      class="rounded-md bg-(--color-accent) px-5 py-2.5 text-sm font-medium text-[#14151a] hover:bg-(--color-accent-hover) disabled:opacity-50"
+    >
+      {{ loading() ? 'Pensando...' : 'Buscar' }}
+    </button>
+  </div>
+
+  @if (interpretation(); as interp) {
+    <div class="flex flex-wrap items-center gap-2 rounded-md border border-(--color-accent-2)/30 bg-(--color-accent-2)/10 px-4 py-2.5 text-sm">
+      <span class="text-(--color-text-muted)">Entendí que buscás:</span>
+      <span class="font-medium text-(--color-accent-2)">"{{ interp.searchQuery }}"</span>
+      @if (interp.type !== null) {
+        <span class="rounded-full bg-(--color-surface-alt) px-2 py-0.5 text-xs">{{ typeLabels[interp.type] }}</span>
+      }
+      @if (interp.status !== null) {
+        <span class="rounded-full bg-(--color-surface-alt) px-2 py-0.5 text-xs">{{ publicationStatusLabels[interp.status] }}</span>
+      }
+      @for (genre of interp.genres; track genre) {
+        <span class="rounded-full bg-(--color-surface-alt) px-2 py-0.5 text-xs">{{ humanizeGenre(genre) }}</span>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="text-(--color-text-muted)">Buscando con esos criterios...</p>
+  } @else if (searched() && results().length === 0) {
+    <p class="text-(--color-text-muted)">No encontramos resultados. Probá describirlo de otra forma.</p>
+  }
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    @for (manga of results(); track manga.malId) {
+      <a
+        [routerLink]="['/manga', manga.malId]"
+        class="flex flex-col overflow-hidden rounded-lg border border-(--color-surface-alt) bg-(--color-surface) transition-colors hover:border-(--color-accent)"
+      >
+        <img [src]="manga.coverImageUrl" [alt]="manga.title" class="aspect-2/3 w-full object-cover" />
+        <div class="p-3">
+          <p class="line-clamp-2 text-sm font-medium">{{ manga.title }}</p>
+          <p class="mt-1 text-xs text-(--color-text-muted)">{{ typeLabels[manga.type] }}</p>
+        </div>
+      </a>
+    }
+  </div>
+</div>

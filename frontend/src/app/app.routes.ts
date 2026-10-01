@@ -16,6 +16,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/search/search.component').then(m => m.SearchComponent)
   },
   {
+    path: 'ai-search',
+    loadComponent: () => import('./features/ai-search/ai-search.component').then(m => m.AiSearchComponent)
+  },
+  {
     path: 'my-list',
     canActivate: [authGuard],
     loadComponent: () => import('./features/my-entries/my-entries.component').then(m => m.MyEntriesComponent )
