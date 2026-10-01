@@ -1,4 +1,5 @@
-﻿using MangaTracker.Application.Interfaces;
+﻿using MangaTracker.Application.DTOs.AiSearch;
+using MangaTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +25,10 @@ public class MangaController(IMangaCatalogService catalogService) : ControllerBa
         var manga = await catalogService.GetMangaByMalIdAsync(malId);
         return manga is null ? NotFound() : Ok(manga);
     }
+    
+    [HttpPost("ai-search")]
+    public async Task<IActionResult> AiSearch(AiSearchRequest request, [FromServices] IAiSearchService aiSearchService)
+        => Ok(await aiSearchService.SearchAsync(request.Description));
     
     // [HttpPost("{malId:int}/snapshot")]
     // [Authorize] // requiere estar logueado — no tiene sentido crear snapshots sin usuario detrás

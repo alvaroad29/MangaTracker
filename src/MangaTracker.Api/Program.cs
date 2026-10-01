@@ -4,6 +4,7 @@ using FluentValidation;
 using MangaTracker.Api.ExceptionHandling;
 using MangaTracker.Api.OpenApi;
 using MangaTracker.Application.Interfaces;
+using MangaTracker.Infrastructure.AiSearch;
 using MangaTracker.Infrastructure.Identity;
 using MangaTracker.Infrastructure.Persistence;
 using MangaTracker.Infrastructure.Services;
@@ -159,6 +160,18 @@ builder.Services.AddSingleton<ITenrai>(sp => // configurando el servicio, distin
     return new TenraiClient(config, httpClient);
 });
 
+// --- gemini ---
+var geminiBaseUrl = builder.Configuration["Gemini:BaseUrl"]!;
+var geminiApiKey = builder.Configuration["Gemini:ApiKey"];
+
+builder.Services.AddHttpClient<IAiSearchTranslationService, GeminiAiSearchTranslationService>(client =>
+{
+    client.BaseAddress = new Uri(geminiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(20);
+    client.DefaultRequestHeaders.Add("x-goog-api-key", geminiApiKey);
+});
+
+builder.Services.AddScoped<IAiSearchService, AiSearchService>();
 
 var app = builder.Build();
 
