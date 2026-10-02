@@ -173,6 +173,9 @@ builder.Services.AddHttpClient<IAiSearchTranslationService, GeminiAiSearchTransl
 
 builder.Services.AddScoped<IAiSearchService, AiSearchService>();
 
+// -- backup
+builder.Services.AddScoped<IBackupService, MangaTracker.Infrastructure.Backup.BackupService>();
+
 var app = builder.Build();
 
 app.UseExceptionHandler(); // primero de todoo, para capturar cualquier error de lo que sigue

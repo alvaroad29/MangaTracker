@@ -1,6 +1,7 @@
 ﻿using MangaTracker.Application.DTOs.Catalog;
 using MangaTracker.Application.Interfaces;
 using MangaTracker.Domain.Entities;
+using MangaTracker.Domain.Enums;
 using MangaTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -70,6 +71,41 @@ public class MangaSnapshotService(
         }
 
         return snapshot;
+    }
+    
+    public async Task<MangaSnapshotDto> GetOrCreateFromKnownDataAsync(int malId, string title, string coverImageUrl, MangaType type)
+    {
+        var existing = await FindExistingAsync(malId);
+        if (existing is not null)
+            return ToDto(existing);
+
+        // Sin llamar a Tenrai ni a Cloudinary: usamos la portada tal cual viene del backup
+        // (ya es una URL de TU Cloudinary de una vez que se creó antes, no de Tenrai)
+        var snapshot = new MangaSnapshot
+        {
+            Id = Guid.NewGuid(),
+            MalId = malId,
+            Title = title,
+            CoverImageUrl = coverImageUrl,
+            Type = type,
+            CreatedAt = DateTime.UtcNow,
+            MangaSnapshotGenres = [] // sin géneros — el backup no los guarda, es un dato secundario que se puede perder
+        };
+
+        db.MangaSnapshots.Add(snapshot);
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            var concurrent = await FindExistingAsync(malId);
+            if (concurrent is not null) return ToDto(concurrent);
+            throw;
+        }
+
+        return ToDto(snapshot);
     }
 
     private async Task<List<Genre>> GetOrCreateGenresAsync(IReadOnlyList<GenreDto> genreDtos)

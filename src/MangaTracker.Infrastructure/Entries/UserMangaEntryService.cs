@@ -1,4 +1,5 @@
-﻿using MangaTracker.Application.DTOs.Catalog;
+﻿using MangaTracker.Application.DTOs.Backup;
+using MangaTracker.Application.DTOs.Catalog;
 using MangaTracker.Application.DTOs.Entries;
 using MangaTracker.Application.Exceptions;
 using MangaTracker.Application.Interfaces;
@@ -104,6 +105,38 @@ public class UserMangaEntryService(ApplicationDbContext db, IMangaSnapshotServic
             .FirstOrDefaultAsync(e => e.UserId == userId && e.MangaSnapshot.MalId == malId);
 
         return entry is null ? null : ToDto(entry, ToSnapshotDto(entry.MangaSnapshot));
+    }
+    
+    public async Task<MangaEntryDto> AddFromBackupAsync(Guid userId, BackupEntryDto backupEntry)
+    {
+        var snapshot = await snapshotService.GetOrCreateFromKnownDataAsync(
+            backupEntry.MalId, backupEntry.Title, backupEntry.CoverImageUrl, backupEntry.Type);
+
+        var alreadyTracked = await db.UserMangaEntries
+            .AnyAsync(e => e.UserId == userId && e.MangaSnapshotId == snapshot.Id);
+
+        if (alreadyTracked)
+            throw new ConflictAppException("Ya estás siguiendo el progreso de este manga.");
+
+        var entry = new UserMangaEntry
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            MangaSnapshotId = snapshot.Id,
+            Status = backupEntry.Status,
+            LastChapterRead = backupEntry.LastChapterRead,
+            Score = backupEntry.Score,
+            Notes = backupEntry.Notes,
+            StartedAt = backupEntry.StartedAt,
+            FinishedAt = backupEntry.FinishedAt,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        db.UserMangaEntries.Add(entry);
+        await db.SaveChangesAsync();
+
+        return ToDto(entry, snapshot);
     }
     
     private static MangaSnapshotDto ToSnapshotDto(MangaSnapshot s) => new(
