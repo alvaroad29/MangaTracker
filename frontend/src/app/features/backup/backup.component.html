@@ -1,0 +1,68 @@
+<div class="mx-auto flex max-w-lg flex-col gap-8">
+  <div>
+    <h1 class="font-display text-2xl text-(--color-accent)">COPIA DE SEGURIDAD</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">
+      Tu progreso vive en nuestra base de datos — si en algún momento este proyecto deja de estar disponible,
+      tené un backup propio para no perder nada.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-3 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-5">
+    <h2 class="font-medium">Backup completo (recomendado)</h2>
+    <p class="text-sm text-(--color-text-muted)">
+      Incluye tus listas, progreso, notas y puntajes. Lo podés reimportar acá mismo más adelante.
+    </p>
+    <button
+      (click)="exportJson()"
+      [disabled]="exportingJson()"
+      class="w-fit rounded-md bg-(--color-accent) px-4 py-1.5 text-sm font-medium text-[#14151a] disabled:opacity-50"
+    >
+      {{ exportingJson() ? 'Generando...' : 'Descargar backup (JSON)' }}
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-3 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-5">
+    <h2 class="font-medium">Para migrar a MyAnimeList / AniList</h2>
+    <p class="text-sm text-(--color-text-muted)">
+      Tu progreso de lectura (sin listas custom) en el formato estándar que MyAnimeList y AniList
+      saben importar directamente.
+    </p>
+    <button
+      (click)="exportMalXml()"
+      [disabled]="exportingXml()"
+      class="w-fit rounded-md border border-(--color-surface-alt) px-4 py-1.5 text-sm font-medium text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent) disabled:opacity-50"
+    >
+      {{ exportingXml() ? 'Generando...' : 'Descargar para MAL/AniList (XML)' }}
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-3 rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-5">
+    <h2 class="font-medium">Restaurar un backup</h2>
+    <p class="text-sm text-(--color-text-muted)">
+      Solo acepta backups en formato JSON generados por esta misma app. No se pisa nada que ya tengas —
+      lo que ya existe se mantiene sin cambios.
+    </p>
+
+    <input
+      type="file"
+      accept="application/json"
+      (change)="onFileSelected($event)"
+      class="text-sm text-(--color-text-muted)"
+    />
+
+    <button
+      (click)="import()"
+      [disabled]="!selectedFile() || importing()"
+      class="w-fit rounded-md border border-(--color-surface-alt) px-4 py-1.5 text-sm font-medium text-(--color-text-muted) hover:border-(--color-accent) hover:text-(--color-accent) disabled:opacity-50"
+    >
+      {{ importing() ? 'Importando...' : 'Importar' }}
+    </button>
+
+    @if (lastImportResult(); as result) {
+      <div class="rounded-md bg-(--color-accent-2)/10 px-3 py-2 text-xs text-(--color-text-muted)">
+        {{ result.entriesImported }} mangas agregados, {{ result.entriesSkipped }} ya los tenías.
+        {{ result.listsImported }} listas creadas, {{ result.listsSkipped }} ya existían.
+      </div>
+    }
+  </div>
+</div>

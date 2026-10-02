@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MangaListService } from '../../core/services/manga-list.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { FormUtils } from '../../shared/form-utils';
+import { FormUtils } from '../../shared/utils/form-utils';
 
 @Component({
   selector: 'app-list-form',

@@ -110,7 +110,7 @@ export class AuthService {
         localStorage.setItem('mt_user', JSON.stringify(user));
         this.currentUser.set(user);
       }
-      
+
     });
   }
 

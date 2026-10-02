@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MangaEntryDto, UpdateMangaEntryRequest } from '../../../core/models/entries.models';
 import { ReadingStatus } from '../../../core/models/enums';
 import { statusLabels } from '../../../core/models/status-labels';
-import { FormUtils } from '../../form-utils';
+import { FormUtils } from '../../utils/form-utils';
 
 @Component({
   selector: 'app-edit-entry-modal',

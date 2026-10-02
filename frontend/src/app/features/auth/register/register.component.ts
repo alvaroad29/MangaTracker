@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { ApiProblemDetails } from '../../../core/auth/models/api-error.model';
 import { AuthService } from '../../../core/auth/services/auth.service';
-import { FormUtils } from '../../../shared/form-utils';
+import { FormUtils } from '../../../shared/utils/form-utils';
 
 @Component({
   selector: 'app-register',
