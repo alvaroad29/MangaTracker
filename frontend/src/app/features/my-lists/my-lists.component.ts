@@ -4,7 +4,7 @@ import { MangaListDto } from '../../core/models/lists.models';
 import { MangaListService } from '../../core/services/manga-list.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
@@ -13,9 +13,10 @@ import { ConfirmModalComponent } from '../../shared/components/confirm-modal/con
   templateUrl: './my-lists.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyListsComponent { // listas de un usuario
+export class MyListsComponent {
   private listService = inject(MangaListService);
   private notifications = inject(NotificationService);
+  private router = inject(Router);
 
   lists = signal<MangaListDto[]>([]);
   loading = signal(true);
@@ -36,6 +37,10 @@ export class MyListsComponent { // listas de un usuario
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  goToList(listId: string): void {
+    this.router.navigate(['/lists', listId]);
   }
 
   confirmDelete(): void {

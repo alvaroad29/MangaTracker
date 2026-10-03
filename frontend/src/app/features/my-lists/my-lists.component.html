@@ -17,19 +17,40 @@
 
   <div class="flex flex-col gap-3">
     @for (list of lists(); track list.id) {
-      <div class="flex items-center justify-between rounded-lg border border-(--color-surface-alt) bg-(--color-surface) p-4">
-        <a [routerLink]="['/lists', list.id]" class="flex flex-col">
-          <span class="font-medium hover:text-(--color-accent)">{{ list.name }}</span>
+      <div
+        (click)="goToList(list.id)"
+        (keydown.enter)="goToList(list.id)"
+        (keydown.space)="$event.preventDefault(); goToList(list.id)"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="'Ver lista ' + list.name"
+        class="flex cursor-pointer items-center justify-between rounded-lg border
+               border-(--color-surface-alt) bg-(--color-surface) p-4
+               transition-colors hover:border-(--color-accent)
+               focus:ring-2 focus:ring-(--color-accent) focus:outline-none"
+      >
+        <div class="flex flex-col">
+          <span class="font-medium">{{ list.name }}</span>
           <span class="text-xs text-(--color-text-muted)">
             {{ list.itemCount }} mangas · {{ list.isPublic ? 'Pública' : 'Privada' }}
           </span>
-        </a>
+        </div>
 
-        <div class="flex items-center gap-3 text-xs">
-          <a [routerLink]="['/lists', list.id, 'edit']" class="text-(--color-accent-2) hover:underline">
+        <div
+          class="flex items-center gap-3 text-xs"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+        >
+          <a
+            [routerLink]="['/lists', list.id, 'edit']"
+            class="text-(--color-accent-2) hover:underline"
+          >
             Editar
           </a>
-          <button (click)="pendingDelete.set(list)" class="text-(--color-danger) hover:underline">
+          <button
+            (click)="pendingDelete.set(list)"
+            class="text-(--color-danger) hover:underline cursor-pointer"
+          >
             Borrar
           </button>
         </div>
