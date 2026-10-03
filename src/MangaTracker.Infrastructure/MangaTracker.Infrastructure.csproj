@@ -14,7 +14,8 @@
       <PackageReference Include="CloudinaryDotNet" Version="1.29.3" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.19" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.19" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.19" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.*" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
       <PackageReference Include="Tenrai.Net" Version="3.1.0" />
     </ItemGroup>
 
