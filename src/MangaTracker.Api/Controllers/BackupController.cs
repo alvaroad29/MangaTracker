@@ -6,16 +6,19 @@ using MangaTracker.Application.DTOs.Backup;
 using MangaTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MangaTracker.Api.Controllers;
 
 
 [ApiController]
 [Route("api/backup")]
+[EnableRateLimiting("export")]
 [Authorize]
 public class BackupController(IBackupService backupService) : ControllerBase
 {
     [HttpGet("export/json")]
+    
     public async Task<IActionResult> ExportJson()
     {
         var data = await backupService.BuildJsonExportAsync(User.GetUserId());

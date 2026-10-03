@@ -2,6 +2,7 @@
 using MangaTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MangaTracker.Api.Controllers;
 
@@ -27,6 +28,7 @@ public class MangaController(IMangaCatalogService catalogService) : ControllerBa
     }
     
     [HttpPost("ai-search")]
+    [EnableRateLimiting("ai-search")]
     public async Task<IActionResult> AiSearch(AiSearchRequest request, [FromServices] IAiSearchService aiSearchService)
         => Ok(await aiSearchService.SearchAsync(request.Description));
     

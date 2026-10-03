@@ -36,7 +36,7 @@ export class AuthService {
       tap(
         res => {
           // console.log("error 1");
-          // console.log(res);
+          console.log(res);
 
 
           this.persistSession(res)

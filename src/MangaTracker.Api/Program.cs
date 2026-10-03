@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 using CloudinaryDotNet;
 using FluentValidation;
 using MangaTracker.Api.ExceptionHandling;
@@ -97,6 +99,79 @@ builder.Services.AddAuthentication(
 
 builder.Services.AddAuthorization();
 
+// rate limit
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+        httpContext =>
+        {
+            var ip = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                     ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                     ?? "unknown";
+            
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ip,
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 200,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                });
+        });
+    
+    options.AddPolicy("export", httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anon";
+        // solo usuarios autenticados llegan al endpoint de export, asi que no importa el "anon"
+        
+        return RateLimitPartition.GetConcurrencyLimiter( // limita cantidad al mismo tiempo 
+            partitionKey: userId,
+            factory: _ => new ConcurrencyLimiterOptions
+            {
+                PermitLimit = 2,  // Max 2 exports simultáneos por usuario
+                QueueLimit = 0
+            });
+    });
+
+    // para login/register/refresh: 10 intentos por minuto, por IP
+    options.AddPolicy("auth", httpContext =>
+    {
+        var ip = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                 ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                 ?? "unknown";
+
+        return RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 4,
+                QueueLimit = 0 // sin cola: el que se pasa del límite, rechazado directo con 429
+            });
+    });
+
+    // para la búsqueda con IA: 5 por minuto por IP — protege tu cuota gratis de Gemini
+    options.AddPolicy("ai-search", httpContext =>
+    {
+        var ip = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                 ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                 ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            });
+    });
+    
+});
+
 // --- Servicios propios ---
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -176,6 +251,17 @@ builder.Services.AddScoped<IAiSearchService, AiSearchService>();
 // -- backup
 builder.Services.AddScoped<IBackupService, MangaTracker.Infrastructure.Backup.BackupService>();
 
+
+var allowedOrigins = builder.Configuration.GetSection("Frontend:AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler(); // primero de todoo, para capturar cualquier error de lo que sigue
@@ -195,6 +281,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("Frontend");
+app.UseRateLimiter();   
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

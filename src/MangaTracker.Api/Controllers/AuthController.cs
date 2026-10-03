@@ -3,11 +3,13 @@ using MangaTracker.Application.DTOs.Auth;
 using MangaTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MangaTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+[EnableRateLimiting("auth")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("register")]
